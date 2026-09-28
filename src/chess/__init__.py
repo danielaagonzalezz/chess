@@ -1,1 +1,1 @@
-"""chessarena: motor de ajedrez y plataforma de bots."""
+"""chess: motor de ajedrez y plataforma de bots."""
