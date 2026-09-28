@@ -1,0 +1,2 @@
+#chess
+Juego de ajedrez
