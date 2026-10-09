@@ -1,159 +1,187 @@
-"""
-Estructuras de datos básicas: colores, tipos de pieza, piezas y casillas.
 
-Este módulo no contiene lógica de movimientos ni de reglas: solo las
-representaciones fundamentales sobre las que se construirán `board.py`,
-`rules.py` y `game.py`.
-"""
 
-from __future__ import annotations
 
-from dataclasses import dataclass
-from enum import Enum
-from typing import Optional
+#Estructuras basicas: colores, tipos de pieza, piezas y casillas.
+ 
 
 from chess.exceptions import InvalidSquareError
+ 
+
+# COLORES
 
 
-class Color(Enum):
-    """Color de un jugador o de una pieza."""
-
-    WHITE = "white"
-    BLACK = "black"
-
-    def opposite(self) -> "Color":
-        """Devuelve el color contrario."""
-        return Color.BLACK if self is Color.WHITE else Color.WHITE
-
-    def __str__(self) -> str:
-        return self.value
-
-
-class PieceType(Enum):
-    """Tipo de pieza, usando la letra estándar de la notación algebraica en inglés."""
-
-    PAWN = "P"
-    KNIGHT = "N"
-    BISHOP = "B"
-    ROOK = "R"
-    QUEEN = "Q"
-    KING = "K"
-
-
-# Valor material estándar de cada pieza (el rey no se valora: no aplica / infinito).
-_MATERIAL_VALUE = {
-    PieceType.PAWN: 1,
-    PieceType.KNIGHT: 3,
-    PieceType.BISHOP: 3,
-    PieceType.ROOK: 5,
-    PieceType.QUEEN: 9,
-    PieceType.KING: 0,
+ 
+WHITE = "white"
+BLACK = "black"
+ 
+ 
+def opposite_color(color):
+    """Devuelve el color contrario al que le pasamos."""
+    if color == WHITE:
+        return BLACK
+    else:
+        return WHITE
+ 
+ 
+# =========================================================
+# TIPOS DE PIEZA
+# =========================================================
+# Igual que con los colores: seis textos fijos, uno por tipo de pieza.
+ 
+PAWN = "pawn"
+KNIGHT = "knight"
+BISHOP = "bishop"
+ROOK = "rook"
+QUEEN = "queen"
+KING = "king"
+ 
+# Letra estandar de cada pieza en notacion de ajedrez.
+PIECE_LETTERS = {
+    PAWN: "P",
+    KNIGHT: "N",
+    BISHOP: "B",
+    ROOK: "R",
+    QUEEN: "Q",
+    KING: "K",
 }
-
-# Símbolos unicode para representar el tablero visualmente (útil en __str__ / debug).
-_UNICODE_SYMBOLS = {
-    (PieceType.PAWN, Color.WHITE): "♙",
-    (PieceType.KNIGHT, Color.WHITE): "♘",
-    (PieceType.BISHOP, Color.WHITE): "♗",
-    (PieceType.ROOK, Color.WHITE): "♖",
-    (PieceType.QUEEN, Color.WHITE): "♕",
-    (PieceType.KING, Color.WHITE): "♔",
-    (PieceType.PAWN, Color.BLACK): "♟",
-    (PieceType.KNIGHT, Color.BLACK): "♞",
-    (PieceType.BISHOP, Color.BLACK): "♝",
-    (PieceType.ROOK, Color.BLACK): "♜",
-    (PieceType.QUEEN, Color.BLACK): "♛",
-    (PieceType.KING, Color.BLACK): "♚",
+ 
+# Valor en puntos de cada pieza (el rey no se valora: 0).
+PIECE_VALUES = {
+    PAWN: 1,
+    KNIGHT: 3,
+    BISHOP: 3,
+    ROOK: 5,
+    QUEEN: 9,
+    KING: 0,
 }
-
-
-@dataclass(frozen=True)
+ 
+# Simbolo visual (unicode) de cada combinacion tipo+color.
+PIECE_UNICODE = {
+    (PAWN, WHITE): "\u2659",
+    (KNIGHT, WHITE): "\u2658",
+    (BISHOP, WHITE): "\u2657",
+    (ROOK, WHITE): "\u2656",
+    (QUEEN, WHITE): "\u2655",
+    (KING, WHITE): "\u2654",
+    (PAWN, BLACK): "\u265F",
+    (KNIGHT, BLACK): "\u265E",
+    (BISHOP, BLACK): "\u265D",
+    (ROOK, BLACK): "\u265C",
+    (QUEEN, BLACK): "\u265B",
+    (KING, BLACK): "\u265A",
+}
+ 
+ 
 class Piece:
-    """Una pieza concreta: su tipo y su color. Inmutable."""
-
-    piece_type: PieceType
-    color: Color
-
-    @property
-    def value(self) -> int:
-        """Valor material estándar (peón=1 ... reina=9, rey=0)."""
-        return _MATERIAL_VALUE[self.piece_type]
-
-    def symbol(self) -> str:
-        """Letra FEN: mayúscula si es blanca, minúscula si es negra (ej. 'N', 'n')."""
-        letter = self.piece_type.value
-        return letter if self.color is Color.WHITE else letter.lower()
-
-    def unicode(self) -> str:
-        """Símbolo unicode de la pieza, para mostrarla en un tablero de texto."""
-        return _UNICODE_SYMBOLS[(self.piece_type, self.color)]
-
-    def __str__(self) -> str:
+    """Una pieza concreta: un tipo (peon, caballo...) y un color."""
+ 
+    def __init__(self, piece_type, color):
+        self.piece_type = piece_type
+        self.color = color
+ 
+    def value(self):
+        """Valor material de la pieza (peon=1 ... reina=9, rey=0)."""
+        return PIECE_VALUES[self.piece_type]
+ 
+    def symbol(self):
+        """Letra de la pieza: mayuscula si es blanca, minuscula si es negra."""
+        letter = PIECE_LETTERS[self.piece_type]
+        if self.color == WHITE:
+            return letter
+        else:
+            return letter.lower()
+ 
+    def unicode(self):
+        """Simbolo visual de la pieza (para imprimir el tablero)."""
+        return PIECE_UNICODE[(self.piece_type, self.color)]
+ 
+    def __str__(self):
+        # Esto se usa cuando haces print(pieza) o str(pieza)
         return self.symbol()
-
-
-_FILES = "abcdefgh"
-
-
-@dataclass(frozen=True)
+ 
+    def __eq__(self, other):
+        # Esto se usa cuando comparas dos piezas con ==
+        if not isinstance(other, Piece):
+            return False
+        return self.piece_type == other.piece_type and self.color == other.color
+ 
+ 
+# =========================================================
+# CASILLAS
+# =========================================================
+ 
+FILES = "abcdefgh"  # las 8 columnas del tablero, de la a a la h
+ 
+ 
 class Square:
     """
-    Una casilla del tablero, en coordenadas internas 0-indexadas.
-
-    file: columna, 0=a ... 7=h
-    rank: fila,   0=rango 1 ... 7=rango 8
+    Una casilla del tablero.
+ 
+    file: columna, numero de 0 a 7 (0=a, 1=b, ... 7=h)
+    rank: fila, numero de 0 a 7 (0=rango 1, 1=rango 2, ... 7=rango 8)
     """
-
-    file: int
-    rank: int
-
-    def __post_init__(self) -> None:
-        if not (0 <= self.file <= 7 and 0 <= self.rank <= 7):
+ 
+    def __init__(self, file, rank):
+        if file < 0 or file > 7 or rank < 0 or rank > 7:
             raise InvalidSquareError(
-                f"Casilla fuera del tablero: file={self.file}, rank={self.rank}"
+                "Casilla fuera del tablero: file=" + str(file) + ", rank=" + str(rank)
             )
-
-    @classmethod
-    def from_algebraic(cls, notation: str) -> "Square":
-        """Crea una Square a partir de notación algebraica, ej. 'e4'."""
-        if len(notation) != 2:
-            raise InvalidSquareError(f"Notación de casilla inválida: '{notation}'")
-
-        file_char, rank_char = notation[0].lower(), notation[1]
-        if file_char not in _FILES or rank_char not in "12345678":
-            raise InvalidSquareError(f"Notación de casilla inválida: '{notation}'")
-
-        return cls(file=_FILES.index(file_char), rank=int(rank_char) - 1)
-
-    def to_algebraic(self) -> str:
-        """Devuelve la notación algebraica, ej. 'e4'."""
-        return f"{_FILES[self.file]}{self.rank + 1}"
-
-    def to_index(self) -> int:
-        """Índice único 0-63 (rank * 8 + file), útil para representar el tablero como lista plana."""
+        self.file = file
+        self.rank = rank
+ #en el a esstá el blanco
+    def to_algebraic(self):
+        """Convierte la casilla a notacion algebraica, por ejemplo 'e4'."""
+        letra_columna = FILES[self.file]
+        numero_fila = self.rank + 1
+        return letra_columna + str(numero_fila)
+ 
+    def to_index(self):
+        """Convierte la casilla a un numero unico de 0 a 63."""
         return self.rank * 8 + self.file
-
-    @classmethod
-    def from_index(cls, index: int) -> "Square":
-        """Crea una Square a partir de un índice 0-63."""
-        if not (0 <= index <= 63):
-            raise InvalidSquareError(f"Índice de casilla inválido: {index}")
-        return cls(file=index % 8, rank=index // 8)
-
-    def offset(self, delta_file: int, delta_rank: int) -> Optional["Square"]:
+ 
+    def offset(self, delta_file, delta_rank):
         """
-        Devuelve la casilla desplazada (delta_file, delta_rank) columnas/filas,
-        o None si el resultado cae fuera del tablero (en vez de lanzar excepción).
-
-        Pensado para la futura generación de movimientos: "intenta ir aquí, y si
-        no se puede, lo descarto sin más" en vez de tener que capturar excepciones
-        en cada llamada.
+        Devuelve la casilla que resulta de moverse delta_file columnas y
+        delta_rank filas desde aqui. Si el resultado cae fuera del
+        tablero, devuelve None en vez de dar un error.
         """
         new_file = self.file + delta_file
         new_rank = self.rank + delta_rank
-        if 0 <= new_file <= 7 and 0 <= new_rank <= 7:
-            return Square(file=new_file, rank=new_rank)
-        return None
-
-    def __str__(self) -> str:
+        if new_file < 0 or new_file > 7 or new_rank < 0 or new_rank > 7:
+            return None
+        return Square(new_file, new_rank)
+ 
+    def __str__(self):
         return self.to_algebraic()
+ 
+    def __eq__(self, other):
+        if not isinstance(other, Square):
+            return False
+        return self.file == other.file and self.rank == other.rank
+ 
+ 
+def square_from_algebraic(notation):
+    """Crea una Square a partir de notacion algebraica, por ejemplo 'e4'."""
+    if len(notation) != 2:
+        raise InvalidSquareError("Notacion de casilla invalida: '" + notation + "'")
+ 
+    letra_columna = notation[0].lower()
+    numero_fila = notation[1]
+ 
+    if letra_columna not in FILES or numero_fila not in "12345678":
+        raise InvalidSquareError("Notacion de casilla invalida: '" + notation + "'")
+ 
+    file = FILES.index(letra_columna)
+    rank = int(numero_fila) - 1
+    return Square(file, rank)
+ 
+ 
+def square_from_index(index):
+    """Crea una Square a partir de un numero de 0 a 63."""
+    if index < 0 or index > 63:
+        raise InvalidSquareError("Indice de casilla invalido: " + str(index))
+    file = index % 8
+    rank = index // 8
+    return Square(file, rank)
+ 
+
