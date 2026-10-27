@@ -2,3 +2,4 @@ site_name: chess
 nav:
   - Inicio: index.md
   - Tablero (board.py): board.md
+  - Dama (movimientos_dama.py): dama.md

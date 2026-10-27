@@ -12,7 +12,8 @@ cualquiera pueda programar su propio bot de ajedrez.
 - [x] Movimientos del caballo (`caballo.py`)
 - [x] Movimientos de la torre (`movimientos_torre.py`)
 - [x] Movimientos del alfil (`movimientos_alfil.py`)
-- [ ] Movimientos de la dama, el rey y el peón
+- [x] Movimientos de la dama (`movimientos_dama.py`)
+- [ ] Movimientos del rey y el peón
 - [ ] Jaque, jaque mate y tablas
 - [ ] Partida completa jugable desde código
 - [ ] Interfaz web
@@ -29,7 +30,8 @@ chess/
 │       ├── board.py              (el tablero)
 │       ├── caballo.py            (movimientos del caballo)
 │       ├── movimientos_torre.py  (movimientos de la torre)
-│       └── movimientos_alfil.py  (movimientos del alfil)
+│       ├── movimientos_alfil.py  (movimientos del alfil)
+│       └── movimientos_dama.py   (movimientos de la dama)
 ├── tests/                        (los tests automáticos)
 └── pyproject.toml
 ```
