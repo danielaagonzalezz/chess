@@ -104,7 +104,8 @@ class Piece:
         if not isinstance(other, Piece):
             return False
         return self.piece_type == other.piece_type and self.color == other.color
- 
+    def __hash__(self):
+        return hash((self.piece_type, self.color))
  
 # =========================================================
 # CASILLAS
@@ -158,8 +159,8 @@ class Square:
         if not isinstance(other, Square):
             return False
         return self.file == other.file and self.rank == other.rank
- 
- 
+    def __hash__(self):
+        return hash((self.file, self.rank))
 def square_from_algebraic(notation):
     """Crea una Square a partir de notacion algebraica, por ejemplo 'e4'."""
     if len(notation) != 2:

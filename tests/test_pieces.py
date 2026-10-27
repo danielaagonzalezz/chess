@@ -180,3 +180,10 @@ def test_square_offset_out_of_bounds_returns_none():
 
 def test_square_str_is_algebraic():
     assert str(square_from_algebraic("g6")) == "g6"
+
+def test_square_is_hashable():
+    a = square_from_algebraic("e4")
+    b = square_from_algebraic("e4")
+    assert len({a, b}) == 1
+    assert {a: "x"}[b] == "x"
+    
