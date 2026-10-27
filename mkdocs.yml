@@ -3,3 +3,4 @@ nav:
   - Inicio: index.md
   - Tablero (board.py): board.md
   - Dama (movimientos_dama.py): dama.md
+  - Rey (movimientos_rey.py): rey.md
