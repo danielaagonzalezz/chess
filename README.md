@@ -1,5 +1,8 @@
 # chess
 
+[![Jugar al ajedrez](https://img.shields.io/badge/%E2%99%9E%20Jugar-contra%20los%20bots-2f6f5b?style=for-the-badge)](https://danielaagonzalezz.github.io/chess/)
+[![Tests](https://github.com/danielaagonzalezz/chess/actions/workflows/tests.yml/badge.svg)](https://github.com/danielaagonzalezz/chess/actions/workflows/tests.yml)
+
 Motor de ajedrez en Python, hecho como práctica de la asignatura de
 Inteligencia Artificial. El objetivo final es tener:
 
