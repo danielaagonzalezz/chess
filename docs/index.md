@@ -16,10 +16,8 @@ cualquiera pueda programar su propio bot de ajedrez.
 - [x] Movimientos del rey (`movimientos_rey.py`)
 - [x] Movimientos del peón (`movimientos_peon.py`)
 - [x] Jugadas (`Move`) y aplicarlas al tablero: capturas, captura al paso y promoción (`move.py`)
-- [ ] Jaque y jugadas legales
-- [ ] Enroque
-- [ ] Jaque mate y tablas
-- [ ] Partida completa jugable desde código
+- [x] Jaque, jugadas legales y enroque (`reglas.py`)
+- [x] Jaque mate y tablas, y partida completa jugable desde código (`game.py`)
 - [ ] Interfaz web
 - [ ] Plataforma de bots
 - [ ] Bot propio con IA
@@ -39,7 +37,9 @@ chess/
 │       ├── movimientos_rey.py    (movimientos del rey)
 │       ├── movimientos_peon.py   (movimientos del peón)
 │       ├── movimientos.py        (movimientos de cualquier pieza)
-│       └── move.py               (jugadas y cómo aplicarlas)
+│       ├── move.py               (jugadas y cómo aplicarlas)
+│       ├── reglas.py             (jaque, jugadas legales, enroque)
+│       └── game.py               (la partida completa)
 ├── tests/                        (los tests automáticos)
 └── pyproject.toml
 ```

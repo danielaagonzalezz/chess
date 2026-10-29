@@ -15,3 +15,7 @@ class InvalidMoveError(ChessError):
 
 class GameOverError(ChessError):
     """Se lanza al intentar hacer un movimiento en una partida ya finalizada."""
+
+
+class InvalidFenError(ChessError):
+    """Se lanza al intentar cargar una posición con un texto FEN mal formado."""

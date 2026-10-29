@@ -6,3 +6,7 @@ nav:
   - Rey (movimientos_rey.py): rey.md
   - Peón (movimientos_peon.py): peon.md
   - Jugadas (move.py): jugadas.md
+  - Reglas y jaque (reglas.py): reglas.md
+  - Partida (game.py): partida.md
+markdown_extensions:
+  - admonition
