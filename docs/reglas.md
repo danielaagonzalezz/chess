@@ -32,6 +32,14 @@ la captura al paso: todo sale solo de esa comprobación.
     trata a los peones aparte: una casilla delante de un peón **no** está
     atacada por él.
 
+!!! note "`casilla_atacada` mira desde la casilla hacia fuera"
+    En vez de preguntar a cada pieza rival a dónde puede ir, se mira desde
+    la casilla en todas las direcciones: un salto de caballo, las 8 casillas
+    del rey, las diagonales del peón y las 8 líneas de torre/alfil/dama
+    (la primera pieza que se encuentra tapa a las demás). Da el mismo
+    resultado y es mucho más rápido, algo clave para que los bots puedan
+    mirar muchas jugadas.
+
 ## El enroque
 
 Se escribe como la jugada del rey: `e1g1` (corto) y `e1c1` (largo) para las

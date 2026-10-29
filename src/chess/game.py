@@ -89,6 +89,7 @@ class Game:
         copia.resultado = self.resultado
         copia.motivo = self.motivo
         copia._legales = self._legales
+        copia._clave = self._clave
         return copia
 
     # -----------------------------------------------------
@@ -165,6 +166,7 @@ class Game:
         self.turno = opposite_color(self.turno)
 
         self._legales = None
+        self._clave = None
         self._registrar_posicion()
         self._actualizar_resultado()
 
@@ -271,6 +273,7 @@ class Game:
         self.resultado = None
         self.motivo = None
         self._legales = None
+        self._clave = None
 
         self._registrar_posicion()
         self._actualizar_resultado()
@@ -296,7 +299,7 @@ class Game:
         elif self._material_insuficiente():
             self.resultado = RESULTADO_TABLAS
             self.motivo = MATERIAL_INSUFICIENTE
-        elif self._repeticiones.get(self._clave_posicion(), 0) >= 3:
+        elif self._repeticiones.get(self.clave_posicion(), 0) >= 3:
             self.resultado = RESULTADO_TABLAS
             self.motivo = TRIPLE_REPETICION
         elif self.medios_movimientos >= 100:
@@ -347,12 +350,20 @@ class Game:
     # Triple repeticion
     # -----------------------------------------------------
 
-    def _clave_posicion(self):
+    def clave_posicion(self):
         """
-        Identifica la posicion actual para contar repeticiones: piezas,
-        turno, enroques y captura al paso (esta ultima solo cuenta si un
-        peon puede realmente hacerla).
+        Identifica la posicion actual: piezas, turno, enroques y captura al
+        paso (esta ultima solo cuenta si un peon puede realmente hacerla).
+
+        Dos posiciones con la misma clave son la misma posicion. Sirve para
+        contar repeticiones y tambien a los bots para recordar posiciones
+        ya analizadas. Se calcula una vez por posicion y se guarda.
         """
+        if self._clave is None:
+            self._clave = self._calcular_clave()
+        return self._clave
+
+    def _calcular_clave(self):
         al_paso = None
         if self.casilla_al_paso is not None:
             sentido = 1 if self.turno == WHITE else -1
@@ -361,12 +372,12 @@ class Game:
                 if origen is not None and self.board.get_piece(origen) == Piece(PAWN, self.turno):
                     al_paso = str(self.casilla_al_paso)
 
-        derechos = "".join(sorted(self.derechos_enroque))
-        return (str(self.board), self.turno, derechos, al_paso)
+        # tuple(...) de las casillas es mucho mas rapido que pasar el tablero a texto.
+        return (tuple(self.board.squares), self.turno, frozenset(self.derechos_enroque), al_paso)
 
     def _registrar_posicion(self):
         """Anota que la posicion actual ha ocurrido una vez mas."""
-        clave = self._clave_posicion()
+        clave = self.clave_posicion()
         self._repeticiones[clave] = self._repeticiones.get(clave, 0) + 1
 
     def __str__(self):

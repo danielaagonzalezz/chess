@@ -8,5 +8,9 @@ version = "0.1.0"
 description = "Motor de ajedrez y plataforma de bots"
 requires-python = ">=3.9"
 
+[project.optional-dependencies]
+# Para la interfaz web: python -m pip install -e ".[web]"
+web = ["streamlit"]
+
 [tool.setuptools.packages.find]
 where = ["src"]

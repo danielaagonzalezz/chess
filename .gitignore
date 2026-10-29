@@ -216,3 +216,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Web estatica: se genera con web_static/build.py
+web_static/py/

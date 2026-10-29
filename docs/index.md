@@ -18,8 +18,9 @@ cualquiera pueda programar su propio bot de ajedrez.
 - [x] Jugadas (`Move`) y aplicarlas al tablero: capturas, captura al paso y promoción (`move.py`)
 - [x] Jaque, jugadas legales y enroque (`reglas.py`)
 - [x] Jaque mate y tablas, y partida completa jugable desde código (`game.py`)
-- [ ] Interfaz web
-- [ ] Plataforma de bots
+- [x] Interfaz web con Streamlit (`web/app.py`)
+- [ ] Plataforma de bots (de momento: clase `Bot` y catálogo `BOTS`)
+- [x] Bots: aleatorio, 1-paso y minimax con poda alfa-beta (`bots/`)
 - [ ] Bot propio con IA
 
 ## Estructura del proyecto
