@@ -156,3 +156,29 @@ def aplicar_jugada(board, move, casilla_al_paso=None):
         board.set_piece(move.destino, pieza)
 
     return pieza_capturada
+
+
+def jugada_desde_texto(texto):
+    """
+    Crea una Move a partir de un texto como "e2e4" o "e7e8q" (promocion).
+
+    Lanza InvalidSquareError si las casillas no existen y InvalidMoveError
+    si el texto no tiene el formato correcto.
+    """
+    from chess.pieces import square_from_algebraic
+
+    texto = texto.strip().lower()
+    if len(texto) not in (4, 5):
+        raise InvalidMoveError("Formato de jugada invalido: '" + texto + "'")
+
+    origen = square_from_algebraic(texto[0:2])
+    destino = square_from_algebraic(texto[2:4])
+
+    promocion = None
+    if len(texto) == 5:
+        letras = {"q": QUEEN, "r": ROOK, "b": BISHOP, "n": KNIGHT}
+        if texto[4] not in letras:
+            raise InvalidMoveError("Promocion invalida: '" + texto[4] + "'")
+        promocion = letras[texto[4]]
+
+    return Move(origen, destino, promocion)
