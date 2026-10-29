@@ -5,3 +5,4 @@ nav:
   - Dama (movimientos_dama.py): dama.md
   - Rey (movimientos_rey.py): rey.md
   - Peón (movimientos_peon.py): peon.md
+  - Jugadas (move.py): jugadas.md
