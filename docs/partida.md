@@ -48,6 +48,7 @@ Las jugadas se escriben como `e2e4`, y con la pieza al promocionar: `e7e8q`
 | `esta_en_jaque()` | `True` si quien mueve está en jaque |
 | `esta_terminada()` | `True` si la partida ha terminado |
 | `ganador()` | `WHITE`, `BLACK` o `None` (sigue o tablas) |
+| `clave_posicion()` | Identifica la posición (piezas, turno, enroques y captura al paso posible); la usan la triple repetición y los bots |
 | `copy()` | Copia independiente: los bots pueden probar jugadas sin tocar la partida real |
 | `fen()` | La posición actual en FEN |
 

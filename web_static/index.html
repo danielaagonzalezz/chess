@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ajedrez contra bots</title>
+  <meta name="description" content="Juega al ajedrez contra bots de IA. El motor en Python se ejecuta en tu navegador, sin instalar nada.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%99%9E%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="cargando" class="cargando" role="status">
+    <div class="spinner"></div>
+    <p><strong>Cargando el motor de ajedrez…</strong></p>
+    <p class="suave">Python se está iniciando en tu navegador (la primera vez tarda unos segundos).</p>
+  </div>
+
+  <main class="app" id="app" hidden>
+    <header class="cabecera">
+      <h1><span class="logo" aria-hidden="true">♞</span> Ajedrez contra bots</h1>
+      <p class="suave">Motor y bots en Python · se ejecutan en tu navegador</p>
+    </header>
+
+    <section class="zona-tablero">
+      <div class="jugador jugador-arriba" id="jugador-arriba">
+        <span class="nombre"></span><span class="capturas"></span>
+      </div>
+
+      <div class="tablero-marco">
+        <div id="tablero" class="tablero" role="grid" aria-label="Tablero de ajedrez"></div>
+        <div id="velo" class="velo" hidden></div>
+      </div>
+
+      <div class="jugador jugador-abajo" id="jugador-abajo">
+        <span class="nombre"></span><span class="capturas"></span>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="tarjeta estado" id="estado" aria-live="polite">
+        <div class="estado-texto" id="estado-texto"></div>
+        <div class="estado-sub suave" id="estado-sub"></div>
+      </div>
+
+      <div class="tarjeta">
+        <h2>Nueva partida</h2>
+        <label>Rival
+          <select id="sel-bot"></select>
+        </label>
+        <p class="suave pista" id="pista-bot"></p>
+        <fieldset>
+          <legend>Juegas con</legend>
+          <label class="opcion"><input type="radio" name="color" value="white" checked> Blancas</label>
+          <label class="opcion"><input type="radio" name="color" value="black"> Negras</label>
+        </fieldset>
+        <button id="btn-nueva" class="primario">Empezar partida</button>
+      </div>
+
+      <div class="tarjeta jugadas-tarjeta">
+        <div class="fila-titulo">
+          <h2>Jugadas</h2>
+          <div class="acciones">
+            <button id="btn-deshacer" title="Deshacer tu última jugada">↶ Deshacer</button>
+            <button id="btn-girar" title="Girar el tablero">⇅ Girar</button>
+          </div>
+        </div>
+        <ol id="jugadas" class="jugadas"></ol>
+        <button id="btn-fen" class="enlace" title="Copiar la posición en notación FEN">Copiar posición (FEN)</button>
+      </div>
+    </aside>
+  </main>
+
+  <dialog id="dlg-promo" class="dialogo">
+    <form method="dialog">
+      <p><strong>Promoción</strong> · elige la pieza</p>
+      <div class="promo-opciones" id="promo-opciones"></div>
+    </form>
+  </dialog>
+
+  <div id="error" class="error" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>

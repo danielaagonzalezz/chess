@@ -8,5 +8,8 @@ nav:
   - Jugadas (move.py): jugadas.md
   - Reglas y jaque (reglas.py): reglas.md
   - Partida (game.py): partida.md
+  - Bots (bots/): bots.md
+  - Interfaz web (web/app.py): web.md
+  - Web estática (web_static/): web-estatica.md
 markdown_extensions:
   - admonition

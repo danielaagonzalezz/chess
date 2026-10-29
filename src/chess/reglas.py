@@ -19,12 +19,16 @@ Los "derechos de enroque" son un conjunto de letras (como en FEN):
 """
 
 from chess.board import Board
+from chess.caballo import DESPLAZAMIENTOS_CABALLO
 from chess.exceptions import InvalidMoveError
 from chess.move import Move, aplicar_jugada, PIEZAS_DE_PROMOCION
 from chess.movimientos import obtener_movimientos
+from chess.movimientos_alfil import DIRECCIONES_ALFIL
+from chess.movimientos_rey import DESPLAZAMIENTOS_REY
+from chess.movimientos_torre import DIRECCIONES_TORRE
 from chess.pieces import (
     Piece, Square, opposite_color,
-    WHITE, PAWN, ROOK, KING,
+    WHITE, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING,
 )
 
 
@@ -35,7 +39,10 @@ def copiar_tablero(board):
     Las piezas (Piece) nunca se modifican, solo se mueven de casilla,
     asi que basta con copiar la lista de casillas.
     """
-    copia = Board()
+    # Board.__new__ crea el objeto SIN ejecutar __init__ (que rellenaria
+    # 64 casillas vacias para luego sustituirlas): asi es bastante mas
+    # rapido, y copiar tableros es lo que mas hace el bot.
+    copia = Board.__new__(Board)
     copia.squares = list(board.squares)
     return copia
 
@@ -53,9 +60,10 @@ def _sentido_del_peon(color):
 
 def encontrar_rey(board, color):
     """Devuelve la casilla del rey de ese color, o None si no hay ninguno."""
-    for casilla, pieza in board.all_pieces():
-        if pieza.piece_type == KING and pieza.color == color:
-            return casilla
+    for indice in range(64):
+        pieza = board.squares[indice]
+        if pieza is not None and pieza.piece_type == KING and pieza.color == color:
+            return Square(indice % 8, indice // 8)
     return None
 
 
@@ -63,23 +71,67 @@ def casilla_atacada(board, casilla, por_color):
     """
     True si alguna pieza de 'por_color' ataca esa casilla.
 
-    Una pieza ataca las casillas a las que podria mover para capturar.
-    Para casi todas las piezas eso coincide con sus movimientos. La
-    excepcion es el peon: avanza recto pero ataca en diagonal, asi que
-    lo tratamos aparte.
-    """
-    for origen, pieza in board.all_pieces():
-        if pieza.color != por_color:
-            continue
+    En vez de preguntar a cada pieza rival a donde puede ir, miramos
+    DESDE la casilla hacia fuera y buscamos piezas rivales que puedan
+    llegar a ella. Es mucho mas rapido y da el mismo resultado:
 
-        if pieza.piece_type == PAWN:
-            sentido = _sentido_del_peon(por_color)
-            for delta_columna in (-1, 1):
-                if origen.offset(delta_columna, sentido) == casilla:
+      - Peones: uno rival en las dos diagonales "de atras" de la casilla.
+      - Caballos: uno rival a un salto de caballo.
+      - Rey: uno rival en las 8 casillas de alrededor.
+      - Torre/dama: la primera pieza que encontremos en cada una de las
+        4 direcciones rectas, si es una torre o dama rival.
+      - Alfil/dama: lo mismo en las 4 diagonales.
+
+    Una pieza "ataca" una casilla aunque en ella haya una pieza de su
+    propio color (la estaria defendiendo).
+    """
+    casillas = board.squares
+    file = casilla.file
+    rank = casilla.rank
+
+    # ---- Peones ----
+    # Un peon blanco ataca hacia arriba, asi que el peon que ataca esta
+    # una fila por DEBAJO de la casilla (y al reves con las negras).
+    sentido = 1 if por_color == WHITE else -1
+    rank_peon = rank - sentido
+    if 0 <= rank_peon <= 7:
+        for delta_columna in (-1, 1):
+            file_peon = file + delta_columna
+            if 0 <= file_peon <= 7:
+                pieza = casillas[rank_peon * 8 + file_peon]
+                if pieza is not None and pieza.piece_type == PAWN and pieza.color == por_color:
                     return True
-        else:
-            if casilla in obtener_movimientos(board, origen):
-                return True
+
+    # ---- Caballos y rey (desplazamientos fijos) ----
+    for desplazamientos, tipo in (
+        (DESPLAZAMIENTOS_CABALLO, KNIGHT),
+        (DESPLAZAMIENTOS_REY, KING),
+    ):
+        for delta_columna, delta_fila in desplazamientos:
+            f = file + delta_columna
+            r = rank + delta_fila
+            if 0 <= f <= 7 and 0 <= r <= 7:
+                pieza = casillas[r * 8 + f]
+                if pieza is not None and pieza.piece_type == tipo and pieza.color == por_color:
+                    return True
+
+    # ---- Piezas que se mueven en linea (torre, alfil, dama) ----
+    for direcciones, tipo in (
+        (DIRECCIONES_TORRE, ROOK),
+        (DIRECCIONES_ALFIL, BISHOP),
+    ):
+        for delta_columna, delta_fila in direcciones:
+            f = file + delta_columna
+            r = rank + delta_fila
+            while 0 <= f <= 7 and 0 <= r <= 7:
+                pieza = casillas[r * 8 + f]
+                if pieza is not None:
+                    # La primera pieza que aparece tapa al resto.
+                    if pieza.color == por_color and pieza.piece_type in (tipo, QUEEN):
+                        return True
+                    break
+                f += delta_columna
+                r += delta_fila
 
     return False
 
