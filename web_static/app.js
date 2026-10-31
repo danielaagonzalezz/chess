@@ -5,6 +5,7 @@ const GLIFOS = { k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" };
 const VS15 = "︎"; // fuerza el simbolo como texto (no emoji)
 const PIEZAS_PROMO = ["q", "r", "b", "n"];
 const DESCRIPCION_BOT = {
+  "humano": "Dos personas en el mismo tablero: juegan por turnos, blancas y luego negras.",
   "aleatorio": "Juega al azar. Ideal para aprender.",
   "1-paso": "Mira una jugada por delante: captura todo lo que puede.",
   "minimax-2": "Piensa 2 jugadas por delante (minimax con poda).",
@@ -60,7 +61,7 @@ function mostrarError(texto, fatal) {
 const idx = (txt) => "abcdefgh".indexOf(txt[0]) + (parseInt(txt[1], 10) - 1) * 8;
 const nombreCasilla = (i) => "abcdefgh"[i % 8] + (Math.floor(i / 8) + 1);
 const esBlanca = (s) => s !== "" && s === s.toUpperCase();
-const orientacionBlancas = () => (S.humano === "white") !== girado;
+const orientacionBlancas = () => (S.orientacion === "white") !== girado;
 const guardar = (k, v) => { try { localStorage.setItem(k, v); } catch (_) {} };
 const leer = (k) => { try { return localStorage.getItem(k); } catch (_) { return null; } };
 
@@ -68,6 +69,8 @@ const leer = (k) => { try { return localStorage.getItem(k); } catch (_) { return
 async function arrancarUI() {
   const bots = await pyJSON("bots");
   for (const b of bots) el.selBot.add(new Option(b, b));
+  el.selBot.add(new Option("👥 Otra persona (mismo dispositivo)", "humano"));
+  bots.push("humano");
   const guardado = leer("bot");
   el.selBot.value = bots.includes(guardado) ? guardado : bots[Math.min(2, bots.length - 1)];
   const colorG = leer("color");
@@ -82,6 +85,8 @@ async function arrancarUI() {
 
 function actualizarPista() {
   el.pista.textContent = DESCRIPCION_BOT[el.selBot.value] || "";
+  const dos = el.selBot.value === "humano";
+  document.querySelector("fieldset").hidden = dos;
 }
 
 async function nuevaPartida() {
@@ -185,9 +190,11 @@ function coord(clase, texto) {
 }
 
 function pintarJugadores() {
-  const humano = S.humano, bot = humano === "white" ? "black" : "white";
+  const humano = S.dos ? "white" : S.humano, bot = humano === "white" ? "black" : "white";
   const abajoEsHumano = orientacionBlancas() === (humano === "white");
-  const quien = (color, esHumano) => (esHumano ? "Tú" : "Bot " + S.bot) + (color === "white" ? " · blancas" : " · negras");
+  const quien = (color, esHumano) => S.dos
+    ? (color === "white" ? "Blancas" : "Negras")
+    : (esHumano ? "Tú" : "Bot " + S.bot) + (color === "white" ? " · blancas" : " · negras");
   const llenar = (cont, color, esHumano) => {
     cont.querySelector(".nombre").textContent = quien(color, esHumano);
     const c = cont.querySelector(".capturas");
@@ -230,6 +237,7 @@ function pintarEstado() {
     el.estado.classList.add("fin");
     let titulo;
     if (S.ganador === null) titulo = "Tablas";
+    else if (S.dos) titulo = "Ganan las " + (S.ganador === "white" ? "blancas" : "negras");
     else titulo = S.ganador === S.humano ? "¡Has ganado!" : "Has perdido";
     el.estadoTexto.textContent = titulo;
     el.estadoSub.textContent = "Por " + (MOTIVOS[S.motivo] || S.motivo) + " (" + S.resultado + ")";
@@ -254,8 +262,9 @@ function pintarEstado() {
   }
   el.velo.hidden = true;
   if (S.turno === S.humano) {
-    el.estadoTexto.textContent = "Tu turno (" + (S.humano === "white" ? "blancas" : "negras") + ")";
-    if (S.jaque) { el.estado.classList.add("alerta"); el.estadoSub.textContent = "¡Estás en jaque!"; }
+    const lado = S.humano === "white" ? "blancas" : "negras";
+    el.estadoTexto.textContent = S.dos ? "Turno de las " + lado : "Tu turno (" + lado + ")";
+    if (S.jaque) { el.estado.classList.add("alerta"); el.estadoSub.textContent = S.dos ? "¡Jaque!" : "¡Estás en jaque!"; }
     else el.estadoSub.textContent = "Arrastra una pieza o púlsala y pulsa su destino.";
   } else {
     el.estado.classList.add("pensando");

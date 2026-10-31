@@ -21,6 +21,7 @@ VALOR = {PAWN: 1, KNIGHT: 3, BISHOP: 3, ROOK: 5, QUEEN: 9}
 _game = None
 _bot = None
 _humano = WHITE
+_dos = False  # True: dos personas en el mismo tablero, sin bot
 _sans = []
 
 
@@ -70,6 +71,8 @@ def _san(game, jugada):
 
 def _estado():
     g = _game
+    # En el modo de dos jugadores "el humano" es quien tiene el turno.
+    humano = g.turno if _dos else _humano
     casillas = []
     for rank in range(8):
         for file in range(8):
@@ -100,7 +103,9 @@ def _estado():
     return json.dumps({
         "casillas": casillas,
         "turno": g.turno,
-        "humano": _humano,
+        "humano": humano,
+        "dos": _dos,
+        "orientacion": WHITE if _dos else _humano,
         "legales": [str(j) for j in g.jugadas_legales()],
         "jaque": g.esta_en_jaque(),
         "rey_en_jaque": rey,
@@ -123,10 +128,11 @@ def bots():
 
 def nueva(color, bot):
     """Empieza una partida. color: 'white' o 'black' (el del humano)."""
-    global _game, _bot, _humano, _sans
+    global _game, _bot, _humano, _sans, _dos
     _game = Game()
     _humano = color
-    _bot = BOTS[bot]()
+    _dos = bot == "humano"
+    _bot = None if _dos else BOTS[bot]()
     _sans = []
     return _estado()
 
@@ -138,7 +144,7 @@ def estado():
 def jugar(texto):
     """Juega la jugada del humano (por ejemplo 'e2e4' o 'e7e8q')."""
     global _sans
-    if _game.esta_terminada() or _game.turno != _humano:
+    if _game.esta_terminada() or (not _dos and _game.turno != _humano):
         raise ValueError("No es tu turno")
     jugada = next((j for j in _game.jugadas_legales() if str(j) == texto), None)
     if jugada is None:
@@ -150,7 +156,7 @@ def jugar(texto):
 
 def mover_bot():
     """Si le toca al bot, elige y juega su jugada."""
-    if _game.esta_terminada() or _game.turno == _humano:
+    if _dos or _game.esta_terminada() or _game.turno == _humano:
         return _estado()
     jugada = _bot.choose_move(_game.copy())
     _sans.append(_san(_game, jugada))
@@ -164,7 +170,7 @@ def deshacer():
     historial = list(_game.historial)
     quitar = 1
     # Si le toca al humano, el bot ya respondio: se quitan dos jugadas.
-    if _game.turno == _humano and len(historial) >= 2:
+    if not _dos and _game.turno == _humano and len(historial) >= 2:
         quitar = 2
     if not historial:
         return _estado()
@@ -178,9 +184,10 @@ def deshacer():
 
 def desde_fen(fen, color, bot):
     """Empieza desde una posicion FEN (util para probar finales y la promocion)."""
-    global _game, _bot, _humano, _sans
+    global _game, _bot, _humano, _sans, _dos
     _game = Game.desde_fen(fen)
     _humano = color
-    _bot = BOTS[bot]()
+    _dos = bot == "humano"
+    _bot = None if _dos else BOTS[bot]()
     _sans = []
     return _estado()
