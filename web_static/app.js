@@ -10,7 +10,18 @@ const DESCRIPCION_BOT = {
   "1-paso": "Mira una jugada por delante: captura todo lo que puede.",
   "minimax-2": "Piensa 2 jugadas por delante (minimax con poda).",
   "minimax-3": "Piensa 3 jugadas por delante.",
-  "minimax-4": "Hasta 4 jugadas por delante, máximo 5 s por jugada. El más fuerte.",
+  "minimax-4": "Hasta 4 jugadas por delante, máximo 5 s por jugada.",
+  "ml-2": "Evaluación aprendida de partidas de Lichess. Piensa 2 jugadas por delante (muy rápido).",
+  "ml-4": "Evaluación aprendida de partidas de Lichess. Piensa 4 jugadas por delante.",
+  "ml-6": "Evaluación aprendida de partidas de Lichess. Piensa 6 jugadas por delante: puede tardar unos segundos.",
+  "ml-3s": "Evaluación y libro de aperturas aprendidos de partidas de Lichess. Piensa hasta 3 s por jugada. El más fuerte.",
+};
+
+// Bots que pueden tardar: se avisa mientras piensan.
+const TIEMPO_BOT = {
+  "minimax-4": "Puede tardar hasta 5 segundos.",
+  "ml-6": "Puede tardar unos segundos.",
+  "ml-3s": "Piensa hasta 3 segundos.",
 };
 
 const $ = (id) => document.getElementById(id);
@@ -269,7 +280,7 @@ function pintarEstado() {
   } else {
     el.estado.classList.add("pensando");
     el.estadoTexto.textContent = "El bot está pensando";
-    el.estadoSub.textContent = S.bot === "minimax-4" ? "Puede tardar hasta 5 segundos." : "";
+    el.estadoSub.textContent = TIEMPO_BOT[S.bot] || "";
   }
 }
 
