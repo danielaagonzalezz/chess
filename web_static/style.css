@@ -179,6 +179,9 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px s
 .fila-titulo { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .acciones { display: flex; gap: 6px; }
 .acciones button { padding: 4px 9px; font-size: .85rem; }
+.fila-bots button { padding: 8px 12px; font-size: .95rem; flex: 1; }
+.bloque-bots { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.bloque-bots select { min-width: 0; }
 .jugadas {
   list-style: none; margin: 0; padding: 0; max-height: 220px; overflow-y: auto;
   display: grid; grid-template-columns: 2.4em 1fr 1fr; gap: 2px 8px; font-variant-numeric: tabular-nums;

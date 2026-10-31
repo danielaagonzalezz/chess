@@ -42,11 +42,35 @@
         <div class="estado-sub suave" id="estado-sub"></div>
       </div>
 
+      <div class="tarjeta" id="ctrl-bots" hidden>
+        <h2>Bot contra bot</h2>
+        <div class="acciones fila-bots">
+          <button id="btn-pausa" title="Pausar o seguir la partida">⏸ Pausa</button>
+          <button id="btn-paso" title="Juega solo una jugada (con la partida en pausa)">⏭ Un paso</button>
+        </div>
+        <label>Velocidad
+          <select id="sel-vel">
+            <option value="1500">Lenta</option>
+            <option value="700" selected>Normal</option>
+            <option value="200">Rápida</option>
+            <option value="0">Lo más rápido posible</option>
+          </select>
+        </label>
+      </div>
+
       <div class="tarjeta">
         <h2>Nueva partida</h2>
-        <label>Rival
+        <label>Rival o modo
           <select id="sel-bot"></select>
         </label>
+        <div id="bloque-bots" class="bloque-bots" hidden>
+          <label>Blancas
+            <select id="sel-blancas"></select>
+          </label>
+          <label>Negras
+            <select id="sel-negras"></select>
+          </label>
+        </div>
         <p class="suave pista" id="pista-bot"></p>
         <fieldset>
           <legend>Juegas con</legend>

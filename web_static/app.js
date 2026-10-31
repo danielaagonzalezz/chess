@@ -6,11 +6,23 @@ const VS15 = "︎"; // fuerza el simbolo como texto (no emoji)
 const PIEZAS_PROMO = ["q", "r", "b", "n"];
 const DESCRIPCION_BOT = {
   "humano": "Dos personas en el mismo tablero: juegan por turnos, blancas y luego negras.",
+  "bots": "Eliges un bot para las blancas y otro para las negras y miras cómo juegan entre sí.",
   "aleatorio": "Juega al azar. Ideal para aprender.",
   "1-paso": "Mira una jugada por delante: captura todo lo que puede.",
   "minimax-2": "Piensa 2 jugadas por delante (minimax con poda).",
   "minimax-3": "Piensa 3 jugadas por delante.",
-  "minimax-4": "Hasta 4 jugadas por delante, máximo 5 s por jugada. El más fuerte.",
+  "minimax-4": "Hasta 4 jugadas por delante, máximo 5 s por jugada.",
+  "ml-2": "Evaluación aprendida de partidas de Lichess. Piensa 2 jugadas por delante (muy rápido).",
+  "ml-4": "Evaluación aprendida de partidas de Lichess. Piensa 4 jugadas por delante.",
+  "ml-6": "Evaluación aprendida de partidas de Lichess. Piensa 6 jugadas por delante: puede tardar unos segundos.",
+  "ml-3s": "Evaluación y libro de aperturas aprendidos de partidas de Lichess. Piensa hasta 3 s por jugada. El más fuerte.",
+};
+
+// Bots que pueden tardar: se avisa mientras piensan.
+const TIEMPO_BOT = {
+  "minimax-4": "Puede tardar hasta 5 segundos.",
+  "ml-6": "Puede tardar unos segundos.",
+  "ml-3s": "Piensa hasta 3 segundos.",
 };
 
 const $ = (id) => document.getElementById(id);
@@ -19,6 +31,8 @@ const el = {
   estadoSub: $("estado-sub"), selBot: $("sel-bot"), pista: $("pista-bot"), jugadas: $("jugadas"),
   arriba: $("jugador-arriba"), abajo: $("jugador-abajo"), dlg: $("dlg-promo"),
   promoOpc: $("promo-opciones"), error: $("error"),
+  ctrlBots: $("ctrl-bots"), bloqueBots: $("bloque-bots"), selBlancas: $("sel-blancas"),
+  selNegras: $("sel-negras"), selVel: $("sel-vel"), btnPausa: $("btn-pausa"), btnPaso: $("btn-paso"),
   btnNueva: $("btn-nueva"), btnDeshacer: $("btn-deshacer"), btnGirar: $("btn-girar"), btnFen: $("btn-fen"),
 };
 
@@ -27,6 +41,8 @@ let sel = null;        // casilla seleccionada (0..63, a1 = 0)
 let girado = false;    // tablero girado a mano
 let ocupado = true;    // esperando al motor
 let casillas = [];     // los 64 divs, en orden visual
+let partida = 0;       // numero de partida: los bucles de partidas viejas se detienen solos
+let pausado = false;   // bot contra bot: partida en pausa
 
 // ---------- comunicacion con el worker ----------
 const worker = new Worker("worker.js" + location.search);
@@ -70,7 +86,20 @@ async function arrancarUI() {
   const bots = await pyJSON("bots");
   for (const b of bots) el.selBot.add(new Option(b, b));
   el.selBot.add(new Option("👥 Otra persona (mismo dispositivo)", "humano"));
-  bots.push("humano");
+  el.selBot.add(new Option("🤖 Bot contra bot", "bots"));
+  for (const b of bots) {
+    el.selBlancas.add(new Option(b, b));
+    el.selNegras.add(new Option(b, b));
+  }
+  const elegir = (sel, clave, porDefecto) => {
+    const g = leer(clave);
+    sel.value = bots.includes(g) ? g : porDefecto;
+  };
+  elegir(el.selBlancas, "bot_blancas", bots.includes("ml-4") ? "ml-4" : bots[bots.length - 1]);
+  elegir(el.selNegras, "bot_negras", bots.includes("minimax-3") ? "minimax-3" : bots[0]);
+  const vel = leer("velocidad");
+  if (vel && [...el.selVel.options].some((o) => o.value === vel)) el.selVel.value = vel;
+  bots.push("humano", "bots");
   const guardado = leer("bot");
   el.selBot.value = bots.includes(guardado) ? guardado : bots[Math.min(2, bots.length - 1)];
   const colorG = leer("color");
@@ -85,21 +114,79 @@ async function arrancarUI() {
 
 function actualizarPista() {
   el.pista.textContent = DESCRIPCION_BOT[el.selBot.value] || "";
-  const dos = el.selBot.value === "humano";
-  document.querySelector("fieldset").hidden = dos;
+  const modo = el.selBot.value;
+  document.querySelector("fieldset").hidden = modo === "humano" || modo === "bots";
+  el.bloqueBots.hidden = modo !== "bots";
 }
 
 async function nuevaPartida() {
   const color = document.querySelector("input[name=color]:checked").value;
-  guardar("bot", el.selBot.value);
+  const modo = el.selBot.value;
+  guardar("bot", modo);
   guardar("color", color);
+  guardar("bot_blancas", el.selBlancas.value);
+  guardar("bot_negras", el.selNegras.value);
+  const id = ++partida;
   ocupado = true;
   sel = null;
   girado = false;
+  pausado = false;
   el.velo.hidden = true;
-  S = await pyJSON("nueva", color, el.selBot.value);
+  const nuevo = modo === "bots"
+    ? await pyJSON("nueva_bots", el.selBlancas.value, el.selNegras.value)
+    : await pyJSON("nueva", color, modo);
+  if (id !== partida) return; // mientras tanto se empezo otra partida
+  S = nuevo;
+  if (S.bvb) {
+    ocupado = false;
+    pintar();
+    jugarBots(id);
+    return;
+  }
   pintar();
   await turnoDelBot();
+}
+
+// ---------- bot contra bot ----------
+const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Un bucle por partida: juega una jugada tras otra hasta que acaba o se empieza otra partida.
+async function jugarBots(id) {
+  while (id === partida && S.bvb && !S.terminada) {
+    if (pausado || ocupado) { await esperar(80); continue; }
+    await esperar(parseInt(el.selVel.value, 10));  // pausa para ver la posicion
+    if (id !== partida || pausado || ocupado) continue;
+    ocupado = true;
+    pintar();
+    try {
+      const nuevo = await pyJSON("mover_bot");
+      if (id !== partida) return;
+      S = nuevo;
+    } catch (e) {
+      if (id !== partida) return;
+      mostrarError("Error del bot: " + e);
+      pausado = true; // para no repetir el error sin parar
+    }
+    ocupado = false;
+    pintar();
+  }
+}
+
+// Con la partida en pausa, juega solo una jugada.
+async function unPaso() {
+  if (!S || !S.bvb || S.terminada || ocupado || !pausado) return;
+  const id = partida;
+  ocupado = true;
+  pintar();
+  try {
+    const nuevo = await pyJSON("mover_bot");
+    if (id === partida) S = nuevo;
+  } catch (e) {
+    if (id === partida) mostrarError("Error del bot: " + e);
+  }
+  if (id !== partida) return;
+  ocupado = false;
+  pintar();
 }
 
 // ---------- tablero ----------
@@ -172,8 +259,15 @@ function pintar() {
   pintarJugadores();
   pintarEstado();
   pintarJugadas();
-  el.btnDeshacer.disabled = ocupado || S.historial.length === 0;
-  el.btnNueva.disabled = ocupado;
+  el.btnDeshacer.disabled = ocupado || S.historial.length === 0 || S.bvb;
+  // En bot contra bot se puede empezar otra partida en cualquier momento.
+  el.btnNueva.disabled = ocupado && !S.bvb;
+  el.ctrlBots.hidden = !S.bvb;
+  if (S.bvb) {
+    el.btnPausa.textContent = pausado ? "▶ Seguir" : "⏸ Pausa";
+    el.btnPausa.disabled = S.terminada;
+    el.btnPaso.disabled = !pausado || ocupado || S.terminada;
+  }
 }
 
 function esAlPaso(origen, destino) {
@@ -190,13 +284,16 @@ function coord(clase, texto) {
 }
 
 function pintarJugadores() {
-  const humano = S.dos ? "white" : S.humano, bot = humano === "white" ? "black" : "white";
-  const abajoEsHumano = orientacionBlancas() === (humano === "white");
-  const quien = (color, esHumano) => S.dos
-    ? (color === "white" ? "Blancas" : "Negras")
-    : (esHumano ? "Tú" : "Bot " + S.bot) + (color === "white" ? " · blancas" : " · negras");
-  const llenar = (cont, color, esHumano) => {
-    cont.querySelector(".nombre").textContent = quien(color, esHumano);
+  const abajoColor = orientacionBlancas() ? "white" : "black";
+  const arribaColor = abajoColor === "white" ? "black" : "white";
+  const quien = (color) => {
+    const lado = color === "white" ? "blancas" : "negras";
+    if (S.bvb) return "Bot " + (color === "white" ? S.bot_blancas : S.bot_negras) + " · " + lado;
+    if (S.dos) return color === "white" ? "Blancas" : "Negras";
+    return (color === S.humano ? "Tú" : "Bot " + S.bot) + " · " + lado;
+  };
+  const llenar = (cont, color) => {
+    cont.querySelector(".nombre").textContent = quien(color);
     const c = cont.querySelector(".capturas");
     c.textContent = "";
     // Las piezas que he capturado son las del color contrario que faltan.
@@ -216,12 +313,9 @@ function pintarJugadores() {
       c.appendChild(v);
     }
   };
-  // La zona de abajo muestra al humano salvo que se haya girado el tablero.
-  if (abajoEsHumano) {
-    llenar(el.abajo, humano, true); llenar(el.arriba, bot, false);
-  } else {
-    llenar(el.abajo, bot, false); llenar(el.arriba, humano, true);
-  }
+  // Abajo van las blancas (o las del humano si juega con negras), salvo que se gire el tablero.
+  llenar(el.abajo, abajoColor);
+  llenar(el.arriba, arribaColor);
 }
 
 const MOTIVOS = {
@@ -237,6 +331,10 @@ function pintarEstado() {
     el.estado.classList.add("fin");
     let titulo;
     if (S.ganador === null) titulo = "Tablas";
+    else if (S.bvb) {
+      const blancas = S.ganador === "white";
+      titulo = "Ganan las " + (blancas ? "blancas" : "negras") + " (" + (blancas ? S.bot_blancas : S.bot_negras) + ")";
+    }
     else if (S.dos) titulo = "Ganan las " + (S.ganador === "white" ? "blancas" : "negras");
     else titulo = S.ganador === S.humano ? "¡Has ganado!" : "Has perdido";
     el.estadoTexto.textContent = titulo;
@@ -249,7 +347,7 @@ function pintarEstado() {
     caja.querySelector("span").textContent = "Por " + (MOTIVOS[S.motivo] || S.motivo);
     const b = document.createElement("button");
     b.className = "primario";
-    b.textContent = "Jugar otra vez";
+    b.textContent = S.bvb ? "Otra partida" : "Jugar otra vez";
     b.onclick = () => nuevaPartida();
     const v = document.createElement("button");
     v.textContent = "Ver el tablero";
@@ -261,6 +359,22 @@ function pintarEstado() {
     return;
   }
   el.velo.hidden = true;
+  if (S.bvb) {
+    const lado = S.turno === "white" ? "blancas" : "negras";
+    const bot = S.turno === "white" ? S.bot_blancas : S.bot_negras;
+    if (ocupado) {
+      el.estado.classList.add("pensando");
+      el.estadoTexto.textContent = "Piensa " + bot + " (" + lado + ")";
+      el.estadoSub.textContent = TIEMPO_BOT[bot] || "";
+    } else if (pausado) {
+      el.estadoTexto.textContent = "En pausa · turno de las " + lado;
+      el.estadoSub.textContent = "Pulsa «Seguir» o «Un paso».";
+    } else {
+      el.estadoTexto.textContent = "Turno de las " + lado + " · " + bot;
+    }
+    if (S.jaque) { el.estado.classList.add("alerta"); el.estadoSub.textContent = "¡Jaque!"; }
+    return;
+  }
   if (S.turno === S.humano) {
     const lado = S.humano === "white" ? "blancas" : "negras";
     el.estadoTexto.textContent = S.dos ? "Turno de las " + lado : "Tu turno (" + lado + ")";
@@ -269,7 +383,7 @@ function pintarEstado() {
   } else {
     el.estado.classList.add("pensando");
     el.estadoTexto.textContent = "El bot está pensando";
-    el.estadoSub.textContent = S.bot === "minimax-4" ? "Puede tardar hasta 5 segundos." : "";
+    el.estadoSub.textContent = TIEMPO_BOT[S.bot] || "";
   }
 }
 
@@ -428,6 +542,9 @@ el.tablero.addEventListener("pointercancel", (ev) => terminarArrastre(ev, true))
 // ---------- botones ----------
 el.btnNueva.onclick = () => nuevaPartida();
 el.selBot.onchange = actualizarPista;
+el.btnPausa.onclick = () => { pausado = !pausado; if (S) pintar(); };
+el.btnPaso.onclick = () => unPaso();
+el.selVel.onchange = () => guardar("velocidad", el.selVel.value);
 el.btnGirar.onclick = () => { girado = !girado; pintar(); };
 el.btnDeshacer.onclick = async () => {
   if (ocupado) return;

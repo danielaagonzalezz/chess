@@ -1,6 +1,7 @@
 """
 Prepara la web estatica: copia el paquete `chess` (src/chess) a web_static/py/
-y escribe py/manifest.json con la lista de archivos.
+y escribe py/manifest.json con la lista de archivos. Copia los .py y tambien
+los .json (los pesos aprendidos y el libro de aperturas del bot ML).
 
 Asi la web usa SIEMPRE el mismo codigo que los tests y los bots, sin
 duplicarlo a mano. Se ejecuta antes de publicar (lo hace el workflow de
@@ -23,7 +24,11 @@ def main():
     if DESTINO.exists():
         shutil.rmtree(DESTINO)
     archivos = []
-    for ruta in sorted(ORIGEN.rglob("*.py")):
+    rutas = sorted(
+        r for r in ORIGEN.rglob("*")
+        if r.suffix in (".py", ".json") and "__pycache__" not in r.parts
+    )
+    for ruta in rutas:
         relativa = ruta.relative_to(ORIGEN.parent)  # chess/board.py
         destino = DESTINO / relativa
         destino.parent.mkdir(parents=True, exist_ok=True)
