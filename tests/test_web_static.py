@@ -73,3 +73,14 @@ def test_notacion_de_jaque_mate_y_promocion():
 def test_enroque():
     bridge.desde_fen("4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1", "white", "aleatorio")
     assert estado(bridge.jugar("e1g1"))["historial"] == ["O-O"]
+
+
+def test_dos_jugadores_se_turnan_sin_bot():
+    s = estado(bridge.nueva("white", "humano"))
+    assert s["dos"] and s["bot"] is None and s["humano"] == "white"
+    s = estado(bridge.jugar("e2e4"))
+    assert s["turno"] == "black" and s["humano"] == "black"   # ahora juegan negras
+    s = estado(bridge.jugar("e7e5"))
+    assert s["historial"] == ["e4", "e5"] and s["orientacion"] == "white"
+    assert estado(bridge.mover_bot())["historial"] == ["e4", "e5"]  # no hay bot
+    assert estado(bridge.deshacer())["historial"] == ["e4"]         # quita 1 jugada
