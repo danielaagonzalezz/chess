@@ -11,6 +11,13 @@ requires-python = ">=3.9"
 [project.optional-dependencies]
 # Para la interfaz web: python -m pip install -e ".[web]"
 web = ["streamlit"]
+# Para entrenar el bot aprendido (paso 2): python -m pip install -e ".[train]"
+# (el paso 1, preparar_datos.py, va en un entorno aparte: mira training/README.md)
+train = ["numpy", "scipy"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+# El fichero con los pesos aprendidos viaja dentro del paquete.
+[tool.setuptools.package-data]
+chess = ["bots/*.json"]
