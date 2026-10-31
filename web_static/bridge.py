@@ -22,6 +22,8 @@ _game = None
 _bot = None
 _humano = WHITE
 _dos = False  # True: dos personas en el mismo tablero, sin bot
+_bvb = False  # True: bot contra bot, sin humano
+_bots = {}    # en bot contra bot: color -> bot
 _sans = []
 
 
@@ -72,7 +74,7 @@ def _san(game, jugada):
 def _estado():
     g = _game
     # En el modo de dos jugadores "el humano" es quien tiene el turno.
-    humano = g.turno if _dos else _humano
+    humano = g.turno if _dos else _humano   # en bot contra bot: None
     casillas = []
     for rank in range(8):
         for file in range(8):
@@ -105,7 +107,10 @@ def _estado():
         "turno": g.turno,
         "humano": humano,
         "dos": _dos,
-        "orientacion": WHITE if _dos else _humano,
+        "bvb": _bvb,
+        "bot_blancas": _bots[WHITE].name if _bvb else None,
+        "bot_negras": _bots[BLACK].name if _bvb else None,
+        "orientacion": WHITE if (_dos or _bvb) else _humano,
         "legales": [str(j) for j in g.jugadas_legales()],
         "jaque": g.esta_en_jaque(),
         "rey_en_jaque": rey,
@@ -128,11 +133,25 @@ def bots():
 
 def nueva(color, bot):
     """Empieza una partida. color: 'white' o 'black' (el del humano)."""
-    global _game, _bot, _humano, _sans, _dos
+    global _game, _bot, _humano, _sans, _dos, _bvb
     _game = Game()
     _humano = color
     _dos = bot == "humano"
+    _bvb = False
     _bot = None if _dos else BOTS[bot]()
+    _sans = []
+    return _estado()
+
+
+def nueva_bots(blancas, negras):
+    """Empieza una partida entre dos bots (nombres del catalogo BOTS)."""
+    global _game, _bot, _humano, _sans, _dos, _bvb, _bots
+    _game = Game()
+    _humano = None
+    _dos = False
+    _bvb = True
+    _bot = None
+    _bots = {WHITE: BOTS[blancas](), BLACK: BOTS[negras]()}
     _sans = []
     return _estado()
 
@@ -155,10 +174,16 @@ def jugar(texto):
 
 
 def mover_bot():
-    """Si le toca al bot, elige y juega su jugada."""
-    if _dos or _game.esta_terminada() or _game.turno == _humano:
+    """Si le toca a un bot, elige y juega su jugada (en bot contra bot, el del turno)."""
+    if _game.esta_terminada():
         return _estado()
-    jugada = _bot.choose_move(_game.copy())
+    if _bvb:
+        bot = _bots[_game.turno]
+    elif _dos or _game.turno == _humano:
+        return _estado()
+    else:
+        bot = _bot
+    jugada = bot.choose_move(_game.copy())
     _sans.append(_san(_game, jugada))
     _game.jugar(jugada)
     return _estado()
@@ -184,10 +209,11 @@ def deshacer():
 
 def desde_fen(fen, color, bot):
     """Empieza desde una posicion FEN (util para probar finales y la promocion)."""
-    global _game, _bot, _humano, _sans, _dos
+    global _game, _bot, _humano, _sans, _dos, _bvb
     _game = Game.desde_fen(fen)
     _humano = color
     _dos = bot == "humano"
+    _bvb = False
     _bot = None if _dos else BOTS[bot]()
     _sans = []
     return _estado()
