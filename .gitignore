@@ -219,3 +219,7 @@ __marimo__/
 
 # Web estatica: se genera con web_static/build.py
 web_static/py/
+
+# Datos de entrenamiento (pesan mucho; se generan con training/preparar_datos.py)
+data/
+.venv-datos/

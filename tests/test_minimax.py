@@ -159,7 +159,10 @@ def test_minimax_da_mate_con_rey_y_dama_contra_rey():
 # ---------- Catalogo ----------
 
 def test_el_catalogo_incluye_los_bots_de_menor_a_mayor_nivel():
-    assert list(BOTS) == ["aleatorio", "1-paso", "minimax-2", "minimax-3", "minimax-4"]
+    assert list(BOTS) == [
+        "aleatorio", "1-paso", "minimax-2", "minimax-3", "minimax-4",
+        "ml-2", "ml-4", "ml-6", "ml-3s",
+    ]
 
 
 @pytest.mark.parametrize("nombre", list(BOTS))

@@ -37,6 +37,8 @@ class PrimerBot(Bot):
 | `minimax-2` | `MinimaxBot(2)` | Piensa 2 jugadas por delante (rápido) |
 | `minimax-3` | `MinimaxBot(3)` | Piensa 3 jugadas por delante (juega bien) |
 | `minimax-4` | `MinimaxBot(4, tiempo=5)` | Hasta 4 jugadas por delante, con un máximo de 5 segundos por jugada |
+| `ml-2`, `ml-4`, `ml-6` | `MLBot(profundidad=N)` | Evaluación **aprendida** de partidas reales + búsqueda rápida, N jugadas por delante |
+| `ml-3s` | `MLBot(tiempo=3, libro=True)` | Lo mismo, pensando hasta 3 segundos por jugada y con libro de aperturas aprendido. El más fuerte |
 
 El catálogo `BOTS` (en `chess/bots/__init__.py`) asocia cada nombre con una
 función que crea el bot. La interfaz web lo usa para ofrecer los rivales.
@@ -114,6 +116,70 @@ cuesta, así que prefiere el mate más rápido y retrasa su propia derrota.
 
 Es un buen rival para un jugador casual o principiante; un jugador de club
 con experiencia o un motor profesional le ganarían.
+
+## `MLBot` — evaluación aprendida de partidas reales
+
+El código está en `ml_bot.py`, `motor_rapido.py`, `evaluacion_ml.py`,
+`caracteristicas.py` y `libro.py`; el entrenamiento, en `training/` (con su
+propio `README.md`, que explica cómo reproducirlo).
+
+**Qué se aprende.** En vez de escribir a mano cuánto vale cada pieza en cada
+casilla, un modelo lo **ajusta con partidas reales de Lichess**. De unas 79 000
+partidas de jugadores de 1600 Elo o más se sacaron 780 000 posiciones
+tranquilas, cada una con el resultado final de su partida. Una **regresión
+logística** busca los pesos para que
+`P(ganan blancas) = sigmoide(evaluación / escala)` prediga bien esos resultados.
+La evaluación es una suma de pesos:
+
+- por **pieza y casilla**, con un juego para el medio juego y otro para el final
+  que se mezclan según el material que queda (así el rey aprende solo a esconderse
+  al principio y a ir al centro al final);
+- por **característica contada** (`caracteristicas.py`): peones doblados, aislados,
+  pasados (según la fila), conectados, pareja de alfiles, torre en columna abierta o
+  semiabierta, torre en séptima, escudo de peones del rey y tener el turno.
+
+Los pesos parten de la evaluación a mano y el valor medio de cada pieza
+(1, 3, 3, 5, 9) se deja fijo: lo que aprende de las partidas es *dónde está mejor
+cada pieza* y cuánto valen esas características (peón doblado: unos −23 cp, torre en
+columna abierta: unos +50 cp, tener el turno: unos +18 cp...). Sin fijar el material,
+el modelo lo infravaloraba (en la apertura casi siempre está igualado) y el bot
+regalaba piezas.
+
+**Un libro de aperturas aprendido.** `training/crear_libro.py` cuenta qué jugada se
+hace en cada posición de las primeras 16 medias jugadas y se queda con las más
+frecuentes. `ml-3s` juega una al azar, ponderada por frecuencia: conoce aperturas
+reales y no repite siempre la misma partida. Fuera del libro, piensa.
+
+**Un motor de búsqueda rápido.** Las jugadas legales de `game.py` se calculan
+probando cada jugada, y cuestan ~1 ms por posición. `motor_rapido.py` es un segundo
+motor *solo para buscar*: tablero como lista de 64 enteros, jugadas que se hacen y se
+deshacen sobre el mismo tablero, generación con tablas precalculadas y hash de
+Zobrist incremental. Hace unas 60 000–100 000 posiciones por segundo (el motor
+anterior, unas 3 700) y llega a profundidad 7–10 en 3 s. Sobre ese motor, la búsqueda
+usa las mejoras de los motores de ajedrez reales: negamax con poda alfa-beta,
+profundización iterativa con límite de tiempo, tabla de transposición, búsqueda de
+capturas, extensión por jaque, **poda por jugada nula**, **reducción de jugadas
+tardías (LMR)**, búsqueda de variante principal, killers e historial.
+
+**Las reglas siguen siendo las de `game.py`.** El bot convierte la partida al motor
+rápido (con `game.fen()`), busca, y comprueba la jugada contra
+`game.jugadas_legales()` antes de devolverla. Los tests comparan los dos motores:
+mismas jugadas legales y mismo hash en miles de posiciones de partidas aleatorias,
+y el recuento `perft` en las posiciones de referencia de la comunidad.
+
+### Qué sabemos de su nivel
+
+Todas las medidas son partidas entre bots, con colores alternados y aperturas
+aleatorias (`training/duelo.py`):
+
+| Enfrentamiento | Resultado |
+|---|---|
+| `ml` 1 s por jugada contra `minimax-4` (hasta 5 s) | **11 victorias, 0 tablas, 1 derrota** (92 %) |
+| `ml-4` contra `minimax-3` | 10 − 3 − 3 (72 %) |
+| Con características contadas contra solo tablas, 0,4 s por jugada | 10 − 6 − 4 (65 %, unos +108 Elo) |
+
+Con tan pocas partidas el margen de error es grande, pero la diferencia con los bots
+anteriores es clara. No se ha medido contra jugadores humanos ni motores externos.
 
 ## Hacer jugar a dos bots
 
