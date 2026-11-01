@@ -9,6 +9,8 @@ nav:
   - Reglas y jaque (reglas.py): reglas.md
   - Partida (game.py): partida.md
   - Bots (bots/): bots.md
+  - Referencia del API de bots: api-bots.md
+  - "Tutorial - sube tu bot": subir-un-bot.md
   - Interfaz web (web/app.py): web.md
   - Web estática (web_static/): web-estatica.md
 markdown_extensions:
