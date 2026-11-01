@@ -12,16 +12,15 @@ Inteligencia Artificial. El objetivo final es tener:
 
 ## Estado del proyecto
 
-- [x] Piezas, casillas y tablero con la posición inicial
-- [x] Movimientos de las seis piezas (caballo, torre, alfil, dama, rey y peón)
-- [x] Jugadas (`Move`) y cómo aplicarlas: capturas, captura al paso y promoción
-- [ ] Jaque y jugadas legales
-- [ ] Enroque
-- [ ] Jaque mate y tablas
-- [ ] Partida completa jugable desde código
-- [ ] Interfaz web
-- [ ] Plataforma de bots
-- [ ] Bots propios y torneo
+- [x] **Juego completo**: piezas, jugadas legales, jaque, enroque, captura al paso,
+  promoción, jaque mate y tablas (`src/chess/`), con tests (incluido `perft`)
+- [x] **Partida jugable desde código**, sin interfaz (`Game`)
+- [x] **Interfaz web** para jugar contra un bot, sin instalar nada: [jugar](https://danielaagonzalezz.github.io/chess/)
+- [x] **Plataforma de bots**: API (`Bot`, catálogo `BOTS`), validación automática de
+  bots nuevos y [tutorial](docs/subir-un-bot.md)
+- [x] **Bots propios**: aleatorio, 1-paso, minimax con poda alfa-beta y `MLBot`
+  (evaluación aprendida de partidas de Lichess + libro de aperturas)
+- [ ] Torneo entre bots y clasificación automática
 
 ## Instalación
 
@@ -74,24 +73,50 @@ Salida de `print(board)`:
 
 Las piezas blancas se escriben en mayúscula y las negras en minúscula.
 
+## Crear tu propio bot
+
+Un bot es una clase con un `name` y un método `choose_move` que recibe la
+partida y devuelve una jugada legal:
+
+```python
+from chess.bots import Bot
+
+
+class PrimerBot(Bot):
+    name = "primero"
+
+    def choose_move(self, game):
+        return game.jugadas_legales()[0]
+```
+
+Para comprobar que cumple el contrato (jugadas legales, sin excepciones, sin
+colgarse):
+
+```bash
+python -m chess.bots.validacion mi_modulo.PrimerBot
+```
+
+El tutorial completo, hasta el *pull request*, está en
+[docs/subir-un-bot.md](docs/subir-un-bot.md), y la referencia del API en
+[docs/api-bots.md](docs/api-bots.md). Al abrir un PR, GitHub Actions valida
+automáticamente todos los bots del catálogo.
+
 ## Estructura del proyecto
 
 ```
 chess/
 ├── src/chess/
-│   ├── pieces.py             colores, tipos de pieza y casillas
-│   ├── board.py              el tablero
-│   ├── caballo.py            movimientos del caballo
-│   ├── movimientos_torre.py  movimientos de la torre
-│   ├── movimientos_alfil.py  movimientos del alfil
-│   ├── movimientos_dama.py   movimientos de la dama
-│   ├── movimientos_rey.py    movimientos del rey
-│   ├── movimientos_peon.py   movimientos del peón
-│   ├── movimientos.py        movimientos de cualquier pieza
-│   ├── move.py               jugadas y cómo aplicarlas
-│   └── exceptions.py         errores del motor
-├── tests/                    tests automáticos (pytest)
-├── docs/                     documentación (MkDocs)
+│   ├── pieces.py, board.py       piezas, casillas y tablero
+│   ├── movimientos*.py, caballo.py   movimientos de cada pieza
+│   ├── move.py                   jugadas y cómo aplicarlas
+│   ├── reglas.py                 jaque, jugadas legales, enroque
+│   ├── game.py                   la partida completa (Game)
+│   └── bots/                     API de bots, catálogo BOTS, validación y bots
+├── web/                          interfaz web con Streamlit
+├── web_static/                   web estática (Pyodide), publicada en GitHub Pages
+├── training/                     entrenamiento del bot aprendido
+├── tests/                        tests automáticos (pytest)
+├── docs/                         documentación (MkDocs)
 └── pyproject.toml
 ```
 

@@ -20,6 +20,10 @@ class PrimerBot(Bot):
         return game.jugadas_legales()[0]
 ```
 
+> ¿Quieres añadir tu propio bot al repositorio? Sigue el
+> [tutorial](subir-un-bot.md); todos los detalles están en la
+> [referencia del API](api-bots.md).
+
 ## Reglas del contrato
 
 - `choose_move` recibe una **copia** de la partida: el bot puede probar

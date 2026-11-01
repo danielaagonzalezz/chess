@@ -19,9 +19,11 @@ cualquiera pueda programar su propio bot de ajedrez.
 - [x] Jaque, jugadas legales y enroque (`reglas.py`)
 - [x] Jaque mate y tablas, y partida completa jugable desde código (`game.py`)
 - [x] Interfaz web con Streamlit (`web/app.py`)
-- [ ] Plataforma de bots (de momento: clase `Bot` y catálogo `BOTS`)
+- [x] Web estática publicada en GitHub Pages (`web_static/`)
+- [x] Plataforma de bots: API (`Bot`, catálogo `BOTS`), validación automática y [tutorial](subir-un-bot.md) (`bots/`)
 - [x] Bots: aleatorio, 1-paso y minimax con poda alfa-beta (`bots/`)
-- [ ] Bot propio con IA
+- [x] Bots con IA: evaluación aprendida de partidas de Lichess y libro de aperturas (`MLBot`)
+- [ ] Torneo y clasificación automática
 
 ## Estructura del proyecto
 
@@ -44,5 +46,7 @@ chess/
 ├── tests/                        (los tests automáticos)
 └── pyproject.toml
 ```
+
+Si quieres programar tu propio bot, empieza por el [tutorial](subir-un-bot.md).
 
 Consulta el menú de la izquierda para ver la documentación de cada módulo.
