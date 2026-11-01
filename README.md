@@ -2,6 +2,7 @@
 
 [![Jugar al ajedrez](https://img.shields.io/badge/%E2%99%9E%20Jugar-contra%20los%20bots-2f6f5b?style=for-the-badge)](https://danielaagonzalezz.github.io/chess/)
 [![Tests](https://github.com/danielaagonzalezz/chess/actions/workflows/tests.yml/badge.svg)](https://github.com/danielaagonzalezz/chess/actions/workflows/tests.yml)
+[![Documentación](https://readthedocs.org/projects/chess-ia/badge/?version=latest)](https://chess-ia.readthedocs.io/)
 
 Motor de ajedrez en Python, hecho como práctica de la asignatura de
 Inteligencia Artificial. El objetivo final es tener:
@@ -122,8 +123,7 @@ chess/
 
 ## Documentación
 
-La documentación de cada módulo está en la carpeta `docs/` y se publica
-con MkDocs en Read the Docs. Para verla en tu ordenador:
+La documentación está publicada en <https://chess-ia.readthedocs.io/>. Para verla en tu ordenador:
 
 ```bash
 python -m pip install -r docs/requirements.txt
