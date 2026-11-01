@@ -123,8 +123,8 @@ chess/
 
 ## Documentación
 
-La documentación está publicada en <https://chess-ia.readthedocs.io/>. Para verla en tu ordenador:
-
+   La documentación está publicada en <https://chess-ia.readthedocs.io/es/latest/>. Para verla en tu ordenador:
+   
 ```bash
 python -m pip install -r docs/requirements.txt
 python -m mkdocs serve
