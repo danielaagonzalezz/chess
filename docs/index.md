@@ -23,7 +23,7 @@ cualquiera pueda programar su propio bot de ajedrez.
 - [x] Plataforma de bots: API (`Bot`, catálogo `BOTS`), validación automática y [tutorial](subir-un-bot.md) (`bots/`)
 - [x] Bots: aleatorio, 1-paso y minimax con poda alfa-beta (`bots/`)
 - [x] Bots con IA: evaluación aprendida de partidas de Lichess y libro de aperturas (`MLBot`)
-- [ ] Torneo y clasificación automática
+- [x] Torneo entre todos los bots y clasificación publicada automáticamente (`torneo.py`)
 
 ## Estructura del proyecto
 

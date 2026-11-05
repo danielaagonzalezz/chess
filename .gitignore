@@ -219,6 +219,9 @@ __marimo__/
 
 # Web estatica: se genera con web_static/build.py
 web_static/py/
+# La clasificacion de bots la genera el workflow (python -m chess.torneo)
+clasificacion/
+web_static/clasificacion.*
 
 # Datos de entrenamiento (pesan mucho; se generan con training/preparar_datos.py)
 data/
