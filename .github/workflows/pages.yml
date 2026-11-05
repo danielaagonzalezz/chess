@@ -1,7 +1,11 @@
 name: Publicar web
 
 # Publica la web estatica (web_static/) en GitHub Pages cada vez que se
-# fusiona algo en main.
+# fusiona algo en main, junto con la clasificacion de los bots.
+#
+# La clasificacion sale de un torneo entre todos los bots de BOTS
+# (python -m chess.torneo). Si el codigo de src/chess no ha cambiado se
+# reutiliza el resultado anterior (cache) y no se vuelve a jugar.
 # Ajuste unico en GitHub: Settings > Pages > Source = "GitHub Actions".
 
 on:
@@ -20,6 +24,7 @@ concurrency:
 
 jobs:
   desplegar:
+    timeout-minutes: 90
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -31,6 +36,24 @@ jobs:
           python-version: "3.12"
       - name: Copiar el paquete chess a la web
         run: python web_static/build.py
+      - name: Recuperar la clasificacion de la cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: clasificacion
+          key: clasificacion-${{ hashFiles('src/chess/**', 'pyproject.toml') }}
+      - name: Jugar el torneo entre todos los bots
+        if: steps.cache.outputs.cache-hit != 'true'
+        # Si el torneo falla, la web se publica igualmente.
+        continue-on-error: true
+        run: |
+          pip install -e .
+          python -m chess.torneo --partidas 2 --max-jugadas 100 --paralelo 4 --salida clasificacion
+      - name: Anadir la clasificacion a la web
+        if: hashFiles('clasificacion/clasificacion.html') != ''
+        run: |
+          cp clasificacion/clasificacion.html clasificacion/clasificacion.json web_static/
+          cat clasificacion/clasificacion.md >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

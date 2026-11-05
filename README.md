@@ -21,7 +21,8 @@ Inteligencia Artificial. El objetivo final es tener:
   bots nuevos y [tutorial](docs/subir-un-bot.md)
 - [x] **Bots propios**: aleatorio, 1-paso, minimax con poda alfa-beta y `MLBot`
   (evaluación aprendida de partidas de Lichess + libro de aperturas)
-- [ ] Torneo entre bots y clasificación automática
+- [x] **Torneo** entre todos los bots y clasificación publicada automáticamente en la web
+  (`python -m chess.torneo`, ver [docs/torneo.md](docs/torneo.md))
 
 ## Instalación
 
@@ -102,6 +103,17 @@ El tutorial completo, hasta el *pull request*, está en
 [docs/api-bots.md](docs/api-bots.md). Al abrir un PR, GitHub Actions valida
 automáticamente todos los bots del catálogo.
 
+## Torneo y clasificación
+
+Todos los bots de `BOTS` juegan entre sí y se publica una clasificación en
+la web (`clasificacion.html`). Un bot que falla, se cuelga o juega una jugada
+ilegal pierde esa partida, pero no rompe el torneo. Para ejecutarlo en tu
+ordenador:
+
+```bash
+python -m chess.torneo --bots aleatorio,1-paso,minimax-2 --partidas 2
+```
+
 ## Estructura del proyecto
 
 ```
@@ -112,6 +124,7 @@ chess/
 │   ├── move.py                   jugadas y cómo aplicarlas
 │   ├── reglas.py                 jaque, jugadas legales, enroque
 │   ├── game.py                   la partida completa (Game)
+│   ├── torneo.py                 torneo entre bots y clasificación
 │   └── bots/                     API de bots, catálogo BOTS, validación y bots
 ├── web/                          interfaz web con Streamlit
 ├── web_static/                   web estática (Pyodide), publicada en GitHub Pages

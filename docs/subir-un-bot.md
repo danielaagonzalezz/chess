@@ -81,7 +81,8 @@ BOTS = {
 ```
 
 Y añádela a `__all__` al final del fichero. Con esto el bot **aparece solo
-en la web y entra en los tests y en el torneo**.
+en la web y entra en los tests y en el [torneo](torneo.md)**: al fusionarse tu
+PR, la clasificación se actualiza sola con tu bot incluido.
 
 ## 4. Valídalo
 
@@ -94,7 +95,13 @@ y en qué posición (jugada ilegal, excepción, tiempo excesivo...). Esta
 validación es la misma que ejecutan los tests del repositorio, así que si
 pasa aquí, pasará en el *pull request*.
 
-Para ver cómo juega, enfréntalo a otro bot:
+Para ver cómo queda frente a los demás, juega un torneo corto:
+
+```bash
+python -m chess.torneo --bots mi-bot,aleatorio,1-paso,minimax-2 --partidas 2
+```
+
+O enfréntalo a un bot concreto:
 
 ```python
 from chess.bots import BOTS
