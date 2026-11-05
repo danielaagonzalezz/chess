@@ -17,7 +17,7 @@ en cuanto se registra en `BOTS`: no hay que hacer nada más.
 - **Elo aproximado.** Se ajusta para que los resultados esperados coincidan
   con los reales. La media del torneo vale 1000. Un bot que lo gana todo tiene
   un Elo alto, pero finito.
-- **Límite de jugadas.** Si una partida pasa de 160 medias jugadas (100 en
+- **Límite de jugadas.** Si una partida pasa de 160 medias jugadas (60 en
   GitHub Actions) se da por tablas, para acotar el tiempo del torneo.
 
 ## Un bot que falla no rompe el torneo
@@ -89,7 +89,7 @@ El workflow `.github/workflows/pages.yml` se ejecuta al fusionar algo en
 `main`:
 
 1. Prepara la web (`web_static/build.py`).
-2. Juega el torneo (`python -m chess.torneo --partidas 2 --max-jugadas 100
+2. Juega el torneo (`python -m chess.torneo --partidas 2 --max-jugadas 60
    --paralelo 4`), **salvo que el código de `src/chess` no haya cambiado**: en
    ese caso reutiliza la clasificación anterior (caché), porque los resultados
    serían los mismos.
