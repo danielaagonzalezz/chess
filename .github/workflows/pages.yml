@@ -48,7 +48,7 @@ jobs:
         continue-on-error: true
         run: |
           pip install -e .
-          python -m chess.torneo --partidas 2 --max-jugadas 100 --paralelo 4 --salida clasificacion
+          python -m chess.torneo --partidas 2 --max-jugadas 60 --paralelo 4 --salida clasificacion
       - name: Anadir la clasificacion a la web
         if: hashFiles('clasificacion/clasificacion.html') != ''
         run: |
