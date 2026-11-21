@@ -7,6 +7,7 @@ mayor nivel.
 """
 
 from chess.bots.base import Bot
+from chess.bots.dama_segura import DamaSegura
 from chess.bots.greedy_bot import GreedyBot
 from chess.bots.minimax_bot import MinimaxBot
 from chess.bots.ml_bot import MLBot
@@ -28,6 +29,9 @@ BOTS = {
     GreedyBot.name: GreedyBot,
     "minimax-2": _minimax(2),
     "minimax-3": _minimax(3),
+    # Enviado por el equipo de Tic-Tac-Toe Arena: minimax sobre el material y
+    # la posicion, hasta 2 segundos por jugada (nivel parecido a minimax-3).
+    DamaSegura.name: DamaSegura,
     # Hasta profundidad 4, pero como mucho 5 segundos por jugada.
     "minimax-4": _minimax(4, tiempo=5),
     # Evaluacion y libro de aperturas aprendidos de partidas de Lichess +
@@ -38,4 +42,4 @@ BOTS = {
     "ml-3s": _ml(tiempo=3, libro=True),
 }
 
-__all__ = ["Bot", "RandomBot", "GreedyBot", "MinimaxBot", "MLBot", "BOTS"]
+__all__ = ["Bot", "RandomBot", "GreedyBot", "MinimaxBot", "MLBot", "DamaSegura", "BOTS"]
