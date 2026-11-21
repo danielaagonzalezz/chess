@@ -43,6 +43,7 @@ class PrimerBot(Bot):
 | `minimax-4` | `MinimaxBot(4, tiempo=5)` | Hasta 4 jugadas por delante, con un máximo de 5 segundos por jugada |
 | `ml-2`, `ml-4`, `ml-6` | `MLBot(profundidad=N)` | Evaluación **aprendida** de partidas reales + búsqueda rápida, N jugadas por delante |
 | `ml-3s` | `MLBot(tiempo=3, libro=True)` | Lo mismo, pensando hasta 3 segundos por jugada y con libro de aperturas aprendido. El más fuerte |
+| `montecarlo` | `MonteCarloBot` | Búsqueda de árbol de Monte Carlo (MCTS): no mira todas las jugadas, **muestrea** partidas cortas y se queda con la jugada que de media termina mejor. 1 segundo por jugada |
 
 El catálogo `BOTS` (en `chess/bots/__init__.py`) asocia cada nombre con una
 función que crea el bot. La interfaz web lo usa para ofrecer los rivales.
@@ -70,6 +71,29 @@ Para cada jugada legal, la prueba en una copia y evalúa el tablero que
 queda. Elige la mejor (al azar entre empates) y siempre da mate si puede.
 Captura todo lo que puede, pero **no piensa en la respuesta del rival**:
 puede capturar un peón defendido con la dama y perderla.
+
+## `MonteCarloBot` (`montecarlo`) — decide por muestreo
+
+En vez de mirar todas las respuestas como el minimax, **prueba muchas
+continuaciones cortas** y elige la jugada que, de media, termina mejor
+(búsqueda de árbol de Monte Carlo, con la fórmula UCT). Cada iteración:
+
+1. **Selección**: baja por el árbol eligiendo el hijo con mejor
+   `media + C·√(ln N / n)`: la media premia lo que funciona y el segundo
+   término obliga a probar jugadas poco exploradas.
+2. **Expansión**: prueba una jugada nueva (las capturas primero).
+3. **Simulación**: juega unas pocas jugadas (casi siempre capturando lo más
+   valioso y sin regalar piezas) y **evalúa** la posición, resolviendo antes las
+   capturas pendientes. La evaluación se pasa a probabilidad de ganar con la
+   curva del Elo. Si hay mate o ahogado se usa el resultado real.
+4. **Retropropagación**: el resultado se suma a todo el camino, desde el punto
+   de vista de quien jugó cada jugada.
+
+Se juega la jugada **más visitada**, que es más fiable que la de mejor media
+(una media con pocas muestras puede ser suerte). Un mate en una jugada se
+juega directamente, y se descartan las jugadas tras las que el rival da mate.
+Usa el motor rápido (`motor_rapido.py`) solo para ir deprisa; las reglas siguen
+siendo las de `game.py`.
 
 ## `MinimaxBot` — piensa por adelantado
 
