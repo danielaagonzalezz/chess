@@ -40,6 +40,7 @@ class PrimerBot(Bot):
 | `1-paso` | `GreedyBot` | Mira una jugada por delante y elige la que mejor deja el tablero |
 | `minimax-2` | `MinimaxBot(2)` | Piensa 2 jugadas por delante (rápido) |
 | `minimax-3` | `MinimaxBot(3)` | Piensa 3 jugadas por delante (juega bien) |
+| `dama-segura` | `DamaSegura` | Minimax con poda alfa-beta sobre el material y la posición, con capturas al final y remate; hasta 2 segundos por jugada. Enviado por el equipo de [Tic-Tac-Toe Arena](https://github.com/antonioorteu2014-create/tictactoe-arena) |
 | `minimax-4` | `MinimaxBot(4, tiempo=5)` | Hasta 4 jugadas por delante, con un máximo de 5 segundos por jugada |
 | `ml-2`, `ml-4`, `ml-6` | `MLBot(profundidad=N)` | Evaluación **aprendida** de partidas reales + búsqueda rápida, N jugadas por delante |
 | `ml-3s` | `MLBot(tiempo=3, libro=True)` | Lo mismo, pensando hasta 3 segundos por jugada y con libro de aperturas aprendido. El más fuerte |
