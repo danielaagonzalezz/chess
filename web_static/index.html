@@ -3,12 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c0c0e">
   <title>Ajedrez contra bots</title>
   <meta name="description" content="Juega al ajedrez contra bots de IA. El motor en Python se ejecuta en tu navegador, sin instalar nada.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%99%9E%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Piezas dibujadas para esta web (SVG) -->
+  <svg class="sprite" aria-hidden="true" width="0" height="0" style="position:absolute">
+  <defs>
+  <linearGradient id="relleno-blanco" gradientUnits="userSpaceOnUse" x1="10" y1="4" x2="36" y2="42"><stop offset="0" stop-color="#ffffff"/><stop offset=".3" stop-color="#dfe2e6"/><stop offset=".55" stop-color="#a3a8b0"/><stop offset=".75" stop-color="#e8eaed"/><stop offset="1" stop-color="#7d828a"/></linearGradient>
+  <linearGradient id="relleno-negro" gradientUnits="userSpaceOnUse" x1="10" y1="4" x2="36" y2="42"><stop offset="0" stop-color="#55555c"/><stop offset=".25" stop-color="#1d1d21"/><stop offset=".6" stop-color="#0b0b0d"/><stop offset=".8" stop-color="#2a2a2f"/><stop offset="1" stop-color="#030304"/></linearGradient>
+  <symbol id="pieza-p" viewBox="0 0 45 45"><path d="M10 39.5C10 37.6 11 36.5 12.6 36H32.4C34 36.5 35 37.6 35 39.5Z"/><path d="M12.6 36C12.6 34.8 13.3 34 14.5 34H30.5C31.7 34 32.4 34.8 32.4 36Z"/><path d="M14.5 34C15.5 29 18 26 20 24.2H25C27 26 29.5 29 30.5 34Z"/><path d="M17 24.2H28A1.6 1.6 0 0 0 28 21H17A1.6 1.6 0 0 0 17 24.2Z"/><circle cx="22.5" cy="15.2" r="5.6"/></symbol>
+  <symbol id="pieza-r" viewBox="0 0 45 45"><path d="M10 39.5C10 37.6 11 36.5 12.6 36H32.4C34 36.5 35 37.6 35 39.5Z"/><path d="M12.6 36C12.6 34.8 13.3 34 14.5 34H30.5C31.7 34 32.4 34.8 32.4 36Z"/><path d="M14.5 34L16 21H29L30.5 34Z"/><path d="M13.5 21H31.5V18.6H13.5Z"/><path d="M14 18.6V10.5H18V13.5H20.6V10.5H24.4V13.5H27V10.5H31V18.6Z"/><path class="det" d="M16.2 26H28.8M15.8 30H29.2"/></symbol>
+  <symbol id="pieza-b" viewBox="0 0 45 45"><path d="M10 39.5C10 37.6 11 36.5 12.6 36H32.4C34 36.5 35 37.6 35 39.5Z"/><path d="M12.6 36C12.6 34.8 13.3 34 14.5 34H30.5C31.7 34 32.4 34.8 32.4 36Z"/><path d="M15 34C16 29 18 26 19.8 24.2H25.2C27 26 29 29 30 34Z"/><path d="M17 24.2H28A1.6 1.6 0 0 0 28 21H17A1.6 1.6 0 0 0 17 24.2Z"/><path d="M22.5 7.8C18.2 11.3 16.6 15 17 18.2C17.4 20.5 19.8 21 22.5 21S27.6 20.5 28 18.2C28.4 15 26.8 11.3 22.5 7.8Z"/><circle cx="22.5" cy="6.4" r="1.7"/><path class="det" d="M25 11.8L21.2 16.6M19 28.5H26"/></symbol>
+  <symbol id="pieza-n" viewBox="0 0 45 45"><path d="M10 39.5C10 37.6 11 36.5 12.6 36H32.4C34 36.5 35 37.6 35 39.5Z"/><path d="M12.6 36C12.6 34.8 13.3 34 14.5 34H30.5C31.7 34 32.4 34.8 32.4 36Z"/><path d="M14.2 34C14.2 29 16.6 26 19.4 22.6C17.4 22.4 15 23.8 13.2 23C11.2 22.2 11 20 12.6 18.2C14.6 16 16.6 13.6 17.6 10.8L16.6 6.8L19.8 9.2L22 6.4L23.4 9.8C28.6 10.8 32.6 15.6 32.6 23C32.6 27.2 31.4 30.8 31.4 34Z"/><circle class="ojo" cx="19.6" cy="14.2" r="1.15"/><path class="det" d="M24.8 11.4C28.4 14 30 19 29.4 25.6M13.6 20.4L14.8 20.9M17 30.5H28"/></symbol>
+  <symbol id="pieza-q" viewBox="0 0 45 45"><path d="M10 39.5C10 37.6 11 36.5 12.6 36H32.4C34 36.5 35 37.6 35 39.5Z"/><path d="M12.6 36C12.6 34.8 13.3 34 14.5 34H30.5C31.7 34 32.4 34.8 32.4 36Z"/><path d="M13.6 34C15 29 15.8 24.4 14.4 18.6L18.4 21.6L19.6 14.2L22.5 20.6L25.4 14.2L26.6 21.6L30.6 18.6C29.2 24.4 30 29 31.4 34Z"/><circle cx="13.8" cy="16.8" r="1.9"/><circle cx="19.4" cy="12.4" r="1.9"/><circle cx="22.5" cy="10.6" r="1.9"/><circle cx="25.6" cy="12.4" r="1.9"/><circle cx="31.2" cy="16.8" r="1.9"/><path class="det" d="M16 25.5H29M15.4 30H29.6"/></symbol>
+  <symbol id="pieza-k" viewBox="0 0 45 45"><path d="M10 39.5C10 37.6 11 36.5 12.6 36H32.4C34 36.5 35 37.6 35 39.5Z"/><path d="M12.6 36C12.6 34.8 13.3 34 14.5 34H30.5C31.7 34 32.4 34.8 32.4 36Z"/><path d="M14 34C15.4 29 15.8 25.2 14.8 21.4C18.4 19.4 26.6 19.4 30.2 21.4C29.2 25.2 29.6 29 31 34Z"/><path d="M16.2 20.6C16 16.4 19 13.6 22.5 13.6S29 16.4 28.8 20.6C25 19.4 20 19.4 16.2 20.6Z"/><path d="M21.2 5.6H23.8V8.2H26.4V10.8H23.8V13.6H21.2V10.8H18.6V8.2H21.2Z"/><path class="det" d="M16 25.5H29M15.6 30H29.4"/></symbol>
+  </defs></svg>
   <div id="cargando" class="cargando" role="status">
     <div class="spinner"></div>
     <p><strong>Cargando el motor de ajedrez…</strong></p>

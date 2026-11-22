@@ -36,8 +36,6 @@ BOTS = {
     # Enviado por el equipo de Tic-Tac-Toe Arena: minimax sobre el material y
     # la posicion, hasta 2 segundos por jugada (nivel parecido a minimax-3).
     DamaSegura.name: DamaSegura,
-    # Hasta profundidad 4, pero como mucho 5 segundos por jugada.
-    "minimax-4": _minimax(4, tiempo=5),
     # Evaluacion y libro de aperturas aprendidos de partidas de Lichess +
     # busqueda rapida. "ml-3s" piensa hasta 3 segundos por jugada.
     "ml-2": _ml(profundidad=2),

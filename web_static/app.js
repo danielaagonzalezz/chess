@@ -1,9 +1,19 @@
 // Interfaz del tablero. El motor de ajedrez (Python) vive en worker.js.
 "use strict";
 
-const GLIFOS = { k: "♚", q: "♛", r: "♜", b: "♝", n: "♞", p: "♟" };
-const VS15 = "︎"; // fuerza el simbolo como texto (no emoji)
 const PIEZAS_PROMO = ["q", "r", "b", "n"];
+const SVG = "http://www.w3.org/2000/svg";
+
+// Dibujo SVG de una pieza (los dibujos estan en index.html, como <symbol>).
+function dibujoPieza(letra) {
+  const svg = document.createElementNS(SVG, "svg");
+  svg.setAttribute("viewBox", "0 0 45 45");
+  svg.setAttribute("aria-hidden", "true");
+  const uso = document.createElementNS(SVG, "use");
+  uso.setAttribute("href", "#pieza-" + letra.toLowerCase());
+  svg.appendChild(uso);
+  return svg;
+}
 const DESCRIPCION_BOT = {
   "humano": "Dos personas en el mismo tablero: juegan por turnos, blancas y luego negras.",
   "bots": "Eliges un bot para las blancas y otro para las negras y miras cómo juegan entre sí.",
@@ -11,7 +21,6 @@ const DESCRIPCION_BOT = {
   "1-paso": "Mira una jugada por delante: captura todo lo que puede.",
   "minimax-2": "Piensa 2 jugadas por delante (minimax con poda).",
   "minimax-3": "Piensa 3 jugadas por delante.",
-  "minimax-4": "Hasta 4 jugadas por delante, máximo 5 s por jugada.",
   "ml-2": "Evaluación aprendida de partidas de Lichess. Piensa 2 jugadas por delante (muy rápido).",
   "ml-4": "Evaluación aprendida de partidas de Lichess. Piensa 4 jugadas por delante.",
   "ml-6": "Evaluación aprendida de partidas de Lichess. Piensa 6 jugadas por delante: puede tardar unos segundos.",
@@ -20,7 +29,6 @@ const DESCRIPCION_BOT = {
 
 // Bots que pueden tardar: se avisa mientras piensan.
 const TIEMPO_BOT = {
-  "minimax-4": "Puede tardar hasta 5 segundos.",
   "ml-6": "Puede tardar unos segundos.",
   "ml-3s": "Piensa hasta 3 segundos.",
 };
@@ -43,6 +51,13 @@ let ocupado = true;    // esperando al motor
 let casillas = [];     // los 64 divs, en orden visual
 let partida = 0;       // numero de partida: los bucles de partidas viejas se detienen solos
 let pausado = false;   // bot contra bot: partida en pausa
+
+// Animaciones: cada jugada nueva se desliza desde su casilla de origen.
+const REDUCIR_MOVIMIENTO = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let claveAnimada = null;   // ultima jugada ya animada
+let largoAnterior = 0;     // jugadas en el historial la ultima vez que se pinto
+let capturasAnteriores = 0;
+let sinAnimar = false;     // la jugada se hizo arrastrando: la pieza ya esta en su sitio
 
 // ---------- comunicacion con el worker ----------
 const worker = new Worker("worker.js" + location.search);
@@ -248,13 +263,15 @@ function pintar() {
     if (pieza) {
       const p = document.createElement("span");
       p.className = "pieza " + (esBlanca(pieza) ? "blanca" : "negra");
-      p.textContent = GLIFOS[pieza.toLowerCase()] + VS15;
+      p.appendChild(dibujoPieza(pieza));
       d.appendChild(p);
     }
     const fila = Math.floor(v / 8), col = v % 8;
     if (col === 0) d.appendChild(coord("fila", String(Math.floor(i / 8) + 1)));
     if (fila === 7) d.appendChild(coord("col", "abcdefgh"[i % 8]));
   }
+  animarUltima();
+  tumbarRey();
 
   pintarJugadores();
   pintarEstado();
@@ -268,6 +285,71 @@ function pintar() {
     el.btnPausa.disabled = S.terminada;
     el.btnPaso.disabled = !pausado || ocupado || S.terminada;
   }
+}
+
+// ---------- animaciones ----------
+function casillaDe(i) {
+  return el.tablero.querySelector('[data-real="' + i + '"]');
+}
+
+// Desliza la pieza que ahora esta en 'destino' desde la casilla 'origen'.
+function deslizar(origen, destino) {
+  const co = casillaDe(origen), cd = casillaDe(destino);
+  const pieza = cd && cd.querySelector(".pieza");
+  if (!co || !pieza) return null;
+  const a = co.getBoundingClientRect(), b = cd.getBoundingClientRect();
+  cd.style.zIndex = 3; // por encima de las casillas vecinas mientras se mueve
+  const anim = pieza.animate(
+    [{ transform: `translate(${a.left - b.left}px, ${a.top - b.top}px) scale(1.08)` }, { transform: "none" }],
+    { duration: 280, easing: "cubic-bezier(.2,.8,.2,1)" });
+  anim.onfinish = anim.oncancel = () => { cd.style.zIndex = ""; };
+  return anim;
+}
+
+function impacto(destino) {
+  const cd = casillaDe(destino);
+  if (!cd) return;
+  const onda = document.createElement("span");
+  onda.className = "impacto";
+  cd.appendChild(onda);
+  onda.addEventListener("animationend", () => onda.remove());
+}
+
+function animarUltima() {
+  const largo = S.historial.length;
+  const capturas = S.capturadas.white.length + S.capturadas.black.length;
+  const clave = largo + ":" + (S.ultima || "");
+  if (clave === claveAnimada) return;
+  const avanza = largo === largoAnterior + 1;
+  const captura = capturas > capturasAnteriores;
+  claveAnimada = clave;
+  largoAnterior = largo;
+  capturasAnteriores = capturas;
+  const arrastrada = sinAnimar;
+  sinAnimar = false;
+  if (!S.ultima || !avanza || REDUCIR_MOVIMIENTO) return;
+
+  const o = idx(S.ultima.slice(0, 2)), d = idx(S.ultima.slice(2, 4));
+  const fin = arrastrada ? null : deslizar(o, d);
+  // Enroque: la torre tambien se desliza.
+  const p = S.casillas[d];
+  if (p && p.toLowerCase() === "k" && Math.abs((o % 8) - (d % 8)) === 2) {
+    const base = Math.floor(d / 8) * 8, corto = d % 8 === 6;
+    deslizar(base + (corto ? 7 : 0), base + (corto ? 5 : 3));
+  }
+  if (captura) {
+    if (fin) fin.finished.then(() => impacto(d), () => {});
+    else impacto(d);
+  }
+}
+
+// Al recibir jaque mate, el rey derrotado se tumba.
+function tumbarRey() {
+  if (!S.terminada || S.motivo !== "jaque mate") return;
+  const rey = S.turno === "white" ? "K" : "k";
+  const i = S.casillas.indexOf(rey);
+  const pieza = i >= 0 && casillaDe(i) && casillaDe(i).querySelector(".pieza");
+  if (pieza) pieza.classList.add("tumbado");
 }
 
 function esAlPaso(origen, destino) {
@@ -301,9 +383,11 @@ function pintarJugadores() {
     const g = document.createElement("span");
     g.className = "grupo";
     const orden = { q: 0, r: 1, b: 2, n: 3, p: 4 };
-    g.textContent = S.capturadas[rival].slice()
-      .sort((a, b) => orden[a.toLowerCase()] - orden[b.toLowerCase()])
-      .map((s) => GLIFOS[s.toLowerCase()] + VS15).join("");
+    g.classList.add(rival === "white" ? "blanca" : "negra");
+    for (const s of S.capturadas[rival].slice()
+      .sort((a, b) => orden[a.toLowerCase()] - orden[b.toLowerCase()])) {
+      g.appendChild(dibujoPieza(s));
+    }
     c.appendChild(g);
     const ventaja = color === "white" ? S.ventaja : -S.ventaja;
     if (ventaja > 0) {
@@ -434,7 +518,7 @@ function pedirPromocion() {
       const b = document.createElement("button");
       b.type = "button";
       b.className = color;
-      b.textContent = GLIFOS[p] + VS15;
+      b.appendChild(dibujoPieza(p));
       b.title = nombres[p];
       b.setAttribute("aria-label", nombres[p]);
       b.onclick = () => { el.dlg.close(); resolve(p); };
@@ -511,9 +595,9 @@ el.tablero.addEventListener("pointermove", (ev) => {
     arrastre.movido = true;
     const f = document.createElement("div");
     f.className = "fantasma " + arrastre.glifo.className.replace("pieza ", "");
-    f.textContent = arrastre.glifo.textContent;
+    f.appendChild(arrastre.glifo.firstChild.cloneNode(true));
     const lado = el.tablero.getBoundingClientRect().width / 8;
-    f.style.fontSize = lado * 0.76 + "px";
+    f.style.width = f.style.height = lado * 0.95 + "px";
     document.body.appendChild(f);
     arrastre.fantasma = f;
     arrastre.glifo.style.opacity = "0.25";
@@ -534,7 +618,8 @@ async function terminarArrastre(ev, cancelar) {
   if (!d) return;
   const destino = parseInt(d.dataset.real, 10);
   if (destino === a.origen) return;
-  if (!(await intentarMover(a.origen, destino))) { sel = null; pintar(); }
+  sinAnimar = true;
+  if (!(await intentarMover(a.origen, destino))) { sinAnimar = false; sel = null; pintar(); }
 }
 el.tablero.addEventListener("pointerup", (ev) => terminarArrastre(ev, false));
 el.tablero.addEventListener("pointercancel", (ev) => terminarArrastre(ev, true));

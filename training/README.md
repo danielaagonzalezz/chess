@@ -54,7 +54,7 @@ python training/entrenar.py data/posiciones.npz --l2 1e-6 --l2-extras 1e-3
 
 # 4. Medir contra otro bot (también con pesos alternativos: ml@ruta.json@0.4)
 python training/duelo.py ml-2 minimax-2 --parejas 10
-python training/duelo.py ml@data/pesos_nuevos.json@1 minimax-4 --parejas 6
+python training/duelo.py ml@data/pesos_nuevos.json@1 minimax-3 --parejas 6
 ```
 
 ## Resultados (septiembre de 2013: 79 193 partidas → 780 795 posiciones)

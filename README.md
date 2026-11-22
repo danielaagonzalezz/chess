@@ -48,13 +48,16 @@ automáticamente todos los bots del catálogo.
 - [x] **Juego completo**: piezas, jugadas legales, jaque, enroque, captura al paso,
   promoción, jaque mate y tablas (`src/chess/`), con tests (incluido `perft`)
 - [x] **Partida jugable desde código**, sin interfaz (`Game`)
-- [x] **Interfaz web** para jugar contra un bot, sin instalar nada: [jugar](https://danielaagonzalezz.github.io/chess/)
+- [x] **Interfaz web** para jugar contra un bot, sin instalar nada: [jugar](https://danielaagonzalezz.github.io/chess/).
+  Tablero de madera con piezas dibujadas en SVG (blancas de plata, negras de ébano)
+  y animaciones; también modo de dos personas y bot contra bot.
 - [x] **Plataforma de bots**: API (`Bot`, catálogo `BOTS`), validación automática de
   bots nuevos y [tutorial](docs/subir-un-bot.md)
-- [x] **Bots propios**: aleatorio, 1-paso, minimax con poda alfa-beta y `MLBot`
-  (evaluación aprendida de partidas de Lichess + libro de aperturas). `ines`
-  es una variante de `MLBot` con libro y hasta 4 segundos de búsqueda por jugada.
-  Además hay bots enviados por otros equipos: `montecarlo` (MCTS) y `dama-segura`.
+- [x] **Bots propios**: `aleatorio`, `1-paso`, minimax con poda alfa-beta
+  (`minimax-2`, `minimax-3`) y `MLBot` (`ml-2`, `ml-4`, `ml-6`, `ml-3s`: evaluación
+  aprendida de partidas de Lichess + libro de aperturas).
+- [x] **Bots externos** recibidos por *pull request*: `montecarlo` (MCTS),
+  `dama-segura` (minimax) e `ines` (variante de `MLBot` con hasta 4 s por jugada).
 - [x] **Torneo** entre todos los bots y clasificación publicada automáticamente en la web
   (`python -m chess.torneo`, ver [docs/torneo.md](docs/torneo.md))
 
@@ -111,8 +114,10 @@ Las piezas blancas se escriben en mayúscula y las negras en minúscula.
 
 ## Torneo y clasificación
 
-Todos los bots de `BOTS` juegan entre sí y se publica una clasificación en
-la web (`clasificacion.html`). Un bot que falla, se cuelga o juega una jugada
+Todos los bots de `BOTS` juegan entre sí y se publica una
+[clasificación](https://danielaagonzalezz.github.io/chess/clasificacion.html) en
+la web, con podio, Elo, un mapa de calor de cada bot contra cada rival y
+gráficos de cómo terminan las partidas. Un bot que falla, se cuelga o juega una jugada
 ilegal pierde esa partida, pero no rompe el torneo. Para ejecutarlo en tu
 ordenador:
 
