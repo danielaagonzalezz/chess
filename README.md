@@ -20,7 +20,8 @@ Inteligencia Artificial. El objetivo final es tener:
 - [x] **Plataforma de bots**: API (`Bot`, catálogo `BOTS`), validación automática de
   bots nuevos y [tutorial](docs/subir-un-bot.md)
 - [x] **Bots propios**: aleatorio, 1-paso, minimax con poda alfa-beta y `MLBot`
-  (evaluación aprendida de partidas de Lichess + libro de aperturas)
+  (evaluación aprendida de partidas de Lichess + libro de aperturas). `ines`
+  es una variante de `MLBot` con libro y hasta 4 segundos de búsqueda por jugada.
 - [x] **Torneo** entre todos los bots y clasificación publicada automáticamente en la web
   (`python -m chess.torneo`, ver [docs/torneo.md](docs/torneo.md))
 

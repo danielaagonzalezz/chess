@@ -9,6 +9,7 @@ mayor nivel.
 from chess.bots.base import Bot
 from chess.bots.dama_segura import DamaSegura
 from chess.bots.greedy_bot import GreedyBot
+from chess.bots.ines_bot import InesBot
 from chess.bots.minimax_bot import MinimaxBot
 from chess.bots.ml_bot import MLBot
 from chess.bots.montecarlo_bot import MonteCarloBot
@@ -43,6 +44,17 @@ BOTS = {
     "ml-4": _ml(profundidad=4),
     "ml-6": _ml(profundidad=6),
     "ml-3s": _ml(tiempo=3, libro=True),
+    InesBot.name: InesBot,
 }
 
-__all__ = ["Bot", "RandomBot", "GreedyBot", "MinimaxBot", "MLBot", "MonteCarloBot", "BOTS", "DamaSegura"]
+__all__ = [
+    "BOTS",
+    "Bot",
+    "DamaSegura",
+    "GreedyBot",
+    "InesBot",
+    "MLBot",
+    "MinimaxBot",
+    "MonteCarloBot",
+    "RandomBot",
+]
