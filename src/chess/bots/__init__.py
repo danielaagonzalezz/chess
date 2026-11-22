@@ -11,6 +11,7 @@ from chess.bots.dama_segura import DamaSegura
 from chess.bots.greedy_bot import GreedyBot
 from chess.bots.minimax_bot import MinimaxBot
 from chess.bots.ml_bot import MLBot
+from chess.bots.montecarlo_bot import MonteCarloBot
 from chess.bots.random_bot import RandomBot
 
 
@@ -27,6 +28,8 @@ def _ml(profundidad=None, tiempo=None, libro=False):
 BOTS = {
     RandomBot.name: RandomBot,
     GreedyBot.name: GreedyBot,
+    # Monte Carlo (MCTS): muestrea partidas cortas en vez de mirar todas las jugadas.
+    MonteCarloBot.name: MonteCarloBot,
     "minimax-2": _minimax(2),
     "minimax-3": _minimax(3),
     # Enviado por el equipo de Tic-Tac-Toe Arena: minimax sobre el material y
@@ -42,4 +45,4 @@ BOTS = {
     "ml-3s": _ml(tiempo=3, libro=True),
 }
 
-__all__ = ["Bot", "RandomBot", "GreedyBot", "MinimaxBot", "MLBot", "DamaSegura", "BOTS"]
+__all__ = ["Bot", "RandomBot", "GreedyBot", "MinimaxBot", "MLBot", "MonteCarloBot", "BOTS", "DamaSegura"]
