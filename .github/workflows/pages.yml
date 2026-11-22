@@ -23,12 +23,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  desplegar:
+  # 1) Juega el torneo (lo lento) y prepara la web.
+  construir:
     timeout-minutes: 90
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.despliegue.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -58,5 +56,16 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: web_static
+
+  # 2) Publica la web. Va en un trabajo aparte para que empiece con permisos
+  #    nuevos: si el torneo tarda mas de ~30 min, publicar en el mismo trabajo
+  #    falla ("No artifacts named github-pages were found").
+  desplegar:
+    needs: construir
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
       - id: despliegue
         uses: actions/deploy-pages@v4
