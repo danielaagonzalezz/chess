@@ -1,51 +1,42 @@
+/* Tema "tablero de coleccion": madera de palisandro y arce barnizada,
+   piezas blancas de plata y negras de ebano, sobre fondo oscuro. */
 :root {
   --fuente-piezas: "Segoe UI Symbol", "Noto Sans Symbols 2", "Apple Symbols", "DejaVu Sans", "Arial Unicode MS", sans-serif;
-  --fondo: #f3efe6;
-  --superficie: #fffdf8;
-  --texto: #25231f;
-  --suave: #6d675b;
-  --borde: #ddd5c4;
-  --acento: #2f6f5b;
-  --acento-texto: #fff;
-  --casilla-clara: #ecdcb8;
-  --casilla-oscura: #b08a5f;
-  --ultima: rgba(255, 214, 10, .45);
-  --seleccion: rgba(47, 111, 91, .55);
-  --jaque: radial-gradient(circle, rgba(220, 38, 38, .85) 0%, rgba(220, 38, 38, 0) 70%);
-  --pieza-blanca: #fffdf5;
-  --pieza-negra: #1d1a16;
-  --sombra: 0 1px 2px rgba(0, 0, 0, .08), 0 8px 24px rgba(60, 45, 20, .08);
-}
-:root[data-tema="oscuro"] { color-scheme: dark; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-tema="claro"]) {
-    --fondo: #17181a;
-    --superficie: #212326;
-    --texto: #ece9e2;
-    --suave: #a29d92;
-    --borde: #34373b;
-    --acento: #58b79b;
-    --acento-texto: #0d1f19;
-    --casilla-clara: #d6c7a3;
-    --casilla-oscura: #8a6a47;
-    --sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
-    color-scheme: dark;
-  }
+  --fuente-titulos: "Cinzel", "Trajan Pro", Georgia, serif;
+  --fondo: #0c0c0e;
+  --superficie: #18181c;
+  --texto: #ecebe7;
+  --suave: #a19e97;
+  --borde: #33333a;
+  --acento: #c7ccd4;
+  --acento-texto: #121216;
+  --casilla-clara: #ecd6ad;
+  --casilla-oscura: #8b4726;
+  --ultima: rgba(214, 170, 60, .42);
+  --seleccion: rgba(150, 175, 210, .55);
+  --jaque: radial-gradient(circle, rgba(220, 38, 38, .9) 0%, rgba(220, 38, 38, 0) 70%);
+  --plata: linear-gradient(165deg, #ffffff 0%, #dfe2e6 22%, #8b9098 48%, #eef0f2 66%, #9aa0a8 82%, #5e636a 100%);
+  --bronce: linear-gradient(165deg, #f3d995 0%, #c49a4e 26%, #5b4220 52%, #c9a25c 70%, #7a5a2a 86%, #3a2a12 100%);
+  --sombra: 0 1px 2px rgba(0, 0, 0, .5), 0 12px 32px rgba(0, 0, 0, .45);
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { margin: 0; }
 body {
-  background: var(--fondo);
+  background: radial-gradient(ellipse 90% 60% at 50% -10%, #2c2c33 0%, #141417 55%, var(--fondo) 100%) fixed, var(--fondo);
   color: var(--texto);
   font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   min-height: 100vh;
 }
 .suave { color: var(--suave); }
+a { color: #d9bf85; }
+a:hover { color: #f1dba6; }
 h1, h2 { margin: 0; line-height: 1.2; }
-h1 { font-size: 1.5rem; letter-spacing: -.01em; }
-h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--suave); }
+h1 { font-family: var(--fuente-titulos); font-size: 1.7rem; font-weight: 700; letter-spacing: .04em; }
+.cabecera h1 { background: var(--plata); -webkit-background-clip: text; background-clip: text; color: transparent; }
+h2 { font-family: var(--fuente-titulos); font-size: .82rem; text-transform: uppercase; letter-spacing: .14em; color: var(--suave); }
 
 /* ---------- carga ---------- */
 .cargando {
@@ -69,7 +60,7 @@ h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: 
 }
 .cabecera { grid-area: cab; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; padding-bottom: 8px; }
 .cabecera p { margin: 0; font-size: .9rem; }
-.logo { color: var(--acento); }
+.logo { -webkit-text-fill-color: #d9dce1; filter: drop-shadow(0 2px 3px rgba(0,0,0,.6)); }
 .zona-tablero { grid-area: tab; min-width: 0; }
 .panel { grid-area: pan; display: flex; flex-direction: column; gap: 14px; }
 
@@ -82,12 +73,32 @@ h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: 
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
   min-height: 34px; padding: 4px 2px; font-weight: 600;
 }
-.jugador .capturas { font-size: 1.15rem; letter-spacing: -.12em; display: flex; align-items: center; gap: 6px; }
+.jugador .capturas { display: flex; align-items: center; gap: 6px; }
 .capturas .ventaja { font-size: .8rem; font-weight: 600; color: var(--suave); letter-spacing: 0; }
-.capturas .grupo { color: var(--texto); opacity: .85; font-family: var(--fuente-piezas); }
+.capturas .grupo { display: flex; }
+.capturas .grupo svg { width: 1.35rem; height: 1.35rem; margin-right: -.45rem; }
 
 /* ---------- tablero ---------- */
-.tablero-marco { position: relative; width: 100%; box-shadow: var(--sombra); border-radius: 6px; overflow: hidden; }
+.tablero-marco {
+  /* Marco de palisandro barnizado */
+  position: relative; width: 100%; border-radius: 12px; padding: clamp(10px, 2.2vw, 20px);
+  background:
+    linear-gradient(160deg, rgba(255,255,255,.16), transparent 35%, rgba(0,0,0,.18) 100%),
+    repeating-linear-gradient(97deg, rgba(0,0,0,.10) 0 1px, transparent 1px 7px, rgba(255,210,160,.06) 7px 9px, transparent 9px 17px),
+    linear-gradient(120deg, #5a2810, #9a5428 30%, #6e3416 55%, #a45d2d 80%, #552510);
+  box-shadow:
+    inset 0 1px 0 rgba(255,230,200,.35), inset 0 -3px 0 rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.25),
+    0 3px 6px rgba(0,0,0,.4), 0 28px 60px rgba(0,0,0,.6);
+}
+.tablero-marco .tablero {
+  border-radius: 3px; overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.55), 0 0 0 3px #e2c592, 0 0 0 4px rgba(0,0,0,.5);
+}
+.tablero {
+  border-radius: 3px; overflow: hidden;
+  box-shadow: 0 0 0 1px #000, 0 0 0 3px #9aa0a8, 0 0 0 4px #000;
+}
+.tablero { border-radius: 4px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,.35), 0 0 0 3px rgba(255,220,160,.12); }
 .tablero {
   display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr);
   aspect-ratio: 1; width: 100%; user-select: none; touch-action: none;
@@ -96,19 +107,33 @@ h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: 
   position: relative; display: grid; place-items: center; cursor: default;
   container-type: size;
 }
-.casilla.clara { background: var(--casilla-clara); }
-.casilla.oscura { background: var(--casilla-oscura); }
+/* Madera barnizada: veta suave y un brillo en diagonal */
+.casilla.clara {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.35), transparent 45%, rgba(120,70,20,.10)),
+    repeating-linear-gradient(88deg, rgba(150,100,40,.07) 0 1px, transparent 1px 6px),
+    var(--casilla-clara);
+}
+.casilla.oscura {
+  background:
+    linear-gradient(135deg, rgba(255,200,150,.22), transparent 45%, rgba(0,0,0,.18)),
+    repeating-linear-gradient(92deg, rgba(40,10,0,.16) 0 1px, transparent 1px 5px, rgba(255,170,110,.07) 5px 7px, transparent 7px 11px),
+    var(--casilla-oscura);
+}
 .casilla.ultima::before { content: ""; position: absolute; inset: 0; background: var(--ultima); }
 .casilla.seleccionada::before { content: ""; position: absolute; inset: 0; background: var(--seleccion); }
-.casilla.jaque::before { content: ""; position: absolute; inset: 0; background: var(--jaque); }
+.casilla.jaque::before { content: ""; position: absolute; inset: 0; background: var(--jaque); animation: late 1.1s ease-in-out infinite; }
+@keyframes late { 50% { opacity: .55; transform: scale(.88); } }
 .casilla.mia { cursor: grab; }
 .casilla.destino { cursor: pointer; }
 .casilla.destino::after {
   content: ""; position: absolute; width: 30%; height: 30%; border-radius: 50%;
-  background: rgba(30, 30, 30, .28);
+  background: rgba(25, 15, 8, .32); animation: aparece .18s ease-out both;
 }
+.casilla.destino:hover::after { background: rgba(25, 15, 8, .5); }
+@keyframes aparece { from { transform: scale(0); opacity: 0; } }
 .casilla.destino.captura::after {
-  width: 92%; height: 92%; background: none; border: 6px solid rgba(30, 30, 30, .28);
+  width: 92%; height: 92%; background: none; border: 6px solid rgba(25, 15, 8, .32);
 }
 .casilla .coord {
   position: absolute; font-size: clamp(9px, 1.6vw, 12px); font-weight: 700; opacity: .7; pointer-events: none;
@@ -120,36 +145,56 @@ h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: 
 
 .pieza {
   position: relative; z-index: 1; line-height: 1; pointer-events: none;
-  font-family: var(--fuente-piezas);
-  font-size: 76cqw;           /* proporcional a la casilla */
-  -webkit-text-stroke: 0;
+  width: 90%; height: 90%;   /* proporcional a la casilla */
+  transition: transform .15s ease, filter .15s ease;
 }
-.pieza.blanca { color: var(--pieza-blanca); text-shadow: 0 0 1px #000, 0 0 2px #000, 0 1px 3px rgba(0,0,0,.55); }
-.pieza.negra { color: var(--pieza-negra); text-shadow: 0 0 1px rgba(255,255,255,.6), 0 1px 2px rgba(0,0,0,.4); }
+.casilla.mia:hover .pieza { transform: translateY(-3%) scale(1.05); }
+.casilla.seleccionada .pieza { transform: translateY(-6%) scale(1.12); }
+.pieza.tumbado { animation: tumbar .7s cubic-bezier(.5,-0.3,.4,1.4) .2s forwards; }
+@keyframes tumbar { to { transform: rotate(90deg) translate(18%, 4%); opacity: .8; } }
+.impacto {
+  position: absolute; inset: 12%; border-radius: 50%; z-index: 2; pointer-events: none;
+  border: 3px solid rgba(255, 236, 170, .9); animation: onda .45s ease-out forwards;
+}
+@keyframes onda { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.35); opacity: 0; } }
+/* Piezas dibujadas en SVG: blancas de marfil con contorno oscuro y negras
+   de ebano con un filo plateado, para que se vean en las dos casillas. */
+.pieza svg, .fantasma svg, .capturas svg, .promo-opciones svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.blanca svg { fill: url(#relleno-blanco); stroke: #2b2c30; }
+.negra svg { fill: url(#relleno-negro); stroke: #000; }
+.blanca svg, .negra svg { stroke-width: 1.35; stroke-linejoin: round; stroke-linecap: round; }
+.blanca svg .det { fill: none; stroke: #5f646b; stroke-width: 1; }
+.negra svg .det { fill: none; stroke: #6e6e76; stroke-width: 1; }
+.blanca svg .ojo { fill: #17171a; stroke: none; }
+.negra svg .ojo { fill: #e6e8eb; stroke: none; }
+.pieza.blanca { filter: drop-shadow(0 2px 2px rgba(0,0,0,.45)); }
+.pieza.negra { filter: drop-shadow(0 0 .8px rgba(255,235,210,.45)) drop-shadow(0 2px 2px rgba(0,0,0,.55)); }
 .fantasma {
   position: fixed; z-index: 50; pointer-events: none; transform: translate(-50%, -52%);
-  font-family: var(--fuente-piezas, sans-serif); line-height: 1; filter: drop-shadow(0 6px 8px rgba(0,0,0,.35));
+  filter: drop-shadow(0 8px 8px rgba(0,0,0,.5));
 }
-.fantasma.blanca { color: var(--pieza-blanca); text-shadow: 0 0 1px #000, 0 0 2px #000; }
-.fantasma.negra { color: var(--pieza-negra); }
+
 
 .velo {
   position: absolute; inset: 0; display: grid; place-items: center; text-align: center;
   background: rgba(20, 20, 20, .55); color: #fff; padding: 1rem; backdrop-filter: blur(1px); z-index: 5;
+  border-radius: 12px; animation: velo .4s ease-out both;
 }
-.velo .caja { background: var(--superficie); color: var(--texto); padding: 18px 26px; border-radius: 12px; box-shadow: var(--sombra); max-width: 90%; }
-.velo .caja strong { display: block; font-size: 1.35rem; margin-bottom: 4px; }
+@keyframes velo { from { opacity: 0; } }
+@keyframes caja { from { opacity: 0; transform: translateY(14px) scale(.94); } }
+.velo .caja { background: var(--superficie); color: var(--texto); padding: 18px 26px; border-radius: 12px; box-shadow: var(--sombra); max-width: 90%; animation: caja .45s cubic-bezier(.2,.8,.2,1) .15s both; }
+.velo .caja strong { display: block; font-family: var(--fuente-titulos); font-size: 1.4rem; margin-bottom: 4px; letter-spacing: .03em; }
 .velo .caja button { margin-top: 12px; }
 
 /* ---------- panel ---------- */
 .tarjeta {
-  background: var(--superficie); border: 1px solid var(--borde); border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,.035), transparent 40%), var(--superficie); border: 1px solid var(--borde); border-radius: 12px;
   padding: 14px 16px; box-shadow: var(--sombra); display: flex; flex-direction: column; gap: 10px;
 }
-.estado-texto { font-size: 1.1rem; font-weight: 700; }
+.estado-texto { font-family: var(--fuente-titulos); font-size: 1.15rem; font-weight: 700; letter-spacing: .02em; }
 .estado-sub { font-size: .9rem; min-height: 1.3em; }
 .estado.fin { border-color: var(--acento); }
-.estado.alerta .estado-texto { color: #c2410c; }
+.estado.alerta .estado-texto { color: #f08a5d; }
 .estado.pensando .estado-texto::after {
   content: ""; display: inline-block; width: .8em; height: .8em; margin-left: .5em; vertical-align: -.05em;
   border: 2px solid var(--borde); border-top-color: var(--acento); border-radius: 50%; animation: gira .8s linear infinite;
@@ -171,7 +216,10 @@ button {
 }
 button:hover:not(:disabled) { border-color: var(--acento); }
 button:disabled { opacity: .45; cursor: not-allowed; }
-button.primario { background: var(--acento); border-color: var(--acento); color: var(--acento-texto); padding: 10px 14px; }
+button.primario {
+  background: var(--plata); border-color: #6b7078; color: var(--acento-texto); padding: 10px 14px;
+  font-family: var(--fuente-titulos); letter-spacing: .06em; text-shadow: 0 1px 0 rgba(255,255,255,.5);
+}
 button.primario:hover:not(:disabled) { filter: brightness(1.08); }
 button.enlace { border: 0; background: none; color: var(--acento); padding: 2px 0; text-align: left; font-weight: 600; }
 button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
@@ -189,7 +237,8 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px s
 }
 .jugadas .num { color: var(--suave); }
 .jugadas .vacio { grid-column: 1 / -1; color: var(--suave); font-size: .9rem; }
-.jugadas .ult { background: var(--ultima); border-radius: 4px; padding: 0 4px; margin: 0 -4px; }
+.jugadas .ult { background: var(--ultima); border-radius: 4px; padding: 0 4px; margin: 0 -4px; animation: aparece-texto .3s ease-out; }
+@keyframes aparece-texto { from { opacity: 0; transform: translateX(-6px); } }
 
 /* ---------- dialogo de promocion ---------- */
 .dialogo { border: 1px solid var(--borde); border-radius: 14px; background: var(--superficie); color: var(--texto); box-shadow: var(--sombra); padding: 16px 20px; }
@@ -200,11 +249,17 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px s
   width: 72px; height: 72px; font-size: 48px; line-height: 1; padding: 0;
   font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "Apple Symbols", "DejaVu Sans", sans-serif;
 }
-.promo-opciones button.blanca { color: var(--pieza-blanca); background: var(--casilla-oscura); text-shadow: 0 0 2px #000; }
-.promo-opciones button.negra { color: var(--pieza-negra); background: var(--casilla-clara); }
+.promo-opciones button { padding: 8px; }
+.promo-opciones button.blanca { background: var(--casilla-oscura); }
+.promo-opciones button.negra { background: var(--casilla-clara); }
 
 .error {
   position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 30;
   background: #7f1d1d; color: #fff; padding: 10px 16px; border-radius: 10px; max-width: 90vw; font-size: .9rem;
 }
-@media (prefers-reduced-motion: reduce) { .spinner, .estado.pensando .estado-texto::after { animation-duration: 3s; } }
+@media (prefers-reduced-motion: reduce) {
+  .spinner, .estado.pensando .estado-texto::after { animation-duration: 3s; }
+  .casilla.jaque::before, .casilla.destino::after, .velo, .velo .caja, .jugadas .ult, .impacto { animation: none; }
+  .pieza { transition: none; }
+  .pieza.tumbado { animation: none; transform: rotate(90deg); }
+}

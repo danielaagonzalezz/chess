@@ -41,7 +41,6 @@ class PrimerBot(Bot):
 | `minimax-2` | `MinimaxBot(2)` | Piensa 2 jugadas por delante (rápido) |
 | `minimax-3` | `MinimaxBot(3)` | Piensa 3 jugadas por delante (juega bien) |
 | `dama-segura` | `DamaSegura` | Minimax con poda alfa-beta sobre el material y la posición, con capturas al final y remate; hasta 2 segundos por jugada. Enviado por el equipo de [Tic-Tac-Toe Arena](https://github.com/antonioorteu2014-create/tictactoe-arena) |
-| `minimax-4` | `MinimaxBot(4, tiempo=5)` | Hasta 4 jugadas por delante, con un máximo de 5 segundos por jugada |
 | `ml-2`, `ml-4`, `ml-6` | `MLBot(profundidad=N)` | Evaluación **aprendida** de partidas reales + búsqueda rápida, N jugadas por delante |
 | `ml-3s` | `MLBot(tiempo=3, libro=True)` | Lo mismo, pensando hasta 3 segundos por jugada y con libro de aperturas aprendido. El más fuerte |
 | `montecarlo` | `MonteCarloBot` | Búsqueda de árbol de Monte Carlo (MCTS): no mira todas las jugadas, **muestrea** partidas cortas y se queda con la jugada que de media termina mejor. 1 segundo por jugada |
@@ -140,8 +139,9 @@ cuesta, así que prefiere el mate más rápido y retrasa su propia derrota.
 - Gana a `aleatorio` y a `1-paso` jugando con blancas y con negras.
 - Da mate con rey y dama contra rey.
 - Con profundidad 3 tarda entre 0,2 y 4 s por jugada (Python puro). La
-  profundidad 4 puede tardar bastante más en posiciones con mucha táctica,
-  por eso `minimax-4` lleva un límite de tiempo.
+  profundidad 4 puede tardar bastante más en posiciones con mucha táctica
+  y no juega mejor en el torneo, así que no está en el catálogo (se puede
+  crear con `MinimaxBot(4, tiempo=5)`).
 
 Es un buen rival para un jugador casual o principiante; un jugador de club
 con experiencia o un motor profesional le ganarían.
