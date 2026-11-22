@@ -1,6 +1,8 @@
 site_name: chess
 nav:
   - Inicio: index.md
+  - "🤖 Tutorial - crea y sube tu bot": subir-un-bot.md
+  - Referencia del API de bots: api-bots.md
   - Tablero (board.py): board.md
   - Dama (movimientos_dama.py): dama.md
   - Rey (movimientos_rey.py): rey.md
@@ -9,8 +11,6 @@ nav:
   - Reglas y jaque (reglas.py): reglas.md
   - Partida (game.py): partida.md
   - Bots (bots/): bots.md
-  - Referencia del API de bots: api-bots.md
-  - "Tutorial - sube tu bot": subir-un-bot.md
   - Torneo y clasificación (torneo.py): torneo.md
   - Interfaz web (web/app.py): web.md
   - Web estática (web_static/): web-estatica.md

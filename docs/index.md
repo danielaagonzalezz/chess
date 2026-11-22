@@ -5,6 +5,13 @@ Inteligencia Artificial. El objetivo final es tener un juego completo,
 una página web donde jugar contra un bot, y una plataforma para que
 cualquiera pueda programar su propio bot de ajedrez.
 
+!!! tip "¿Quieres programar tu propio bot?"
+    Un bot es una clase de Python con un método `choose_move`. Sigue el
+    [tutorial paso a paso](subir-un-bot.md) para escribirlo, comprobarlo y
+    enviarlo con un *pull request*: entrará en el torneo y en la
+    [web](https://danielaagonzalezz.github.io/chess/). Todas las clases y
+    métodos están en la [referencia del API](api-bots.md).
+
 ## Estado actual del proyecto
 
 - [x] Piezas y casillas del tablero (`pieces.py`)
@@ -46,7 +53,5 @@ chess/
 ├── tests/                        (los tests automáticos)
 └── pyproject.toml
 ```
-
-Si quieres programar tu propio bot, empieza por el [tutorial](subir-un-bot.md).
 
 Consulta el menú de la izquierda para ver la documentación de cada módulo.

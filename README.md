@@ -2,6 +2,7 @@
 
 [![Jugar al ajedrez](https://img.shields.io/badge/%E2%99%9E%20Jugar-contra%20los%20bots-2f6f5b?style=for-the-badge)](https://danielaagonzalezz.github.io/chess/)
 [![Tests](https://github.com/danielaagonzalezz/chess/actions/workflows/tests.yml/badge.svg)](https://github.com/danielaagonzalezz/chess/actions/workflows/tests.yml)
+[![Crea tu bot](https://img.shields.io/badge/%F0%9F%A4%96%20Crea-tu%20propio%20bot-c0602b?style=for-the-badge)](https://chess-ia.readthedocs.io/es/latest/subir-un-bot/)
 [![Documentación](https://readthedocs.org/projects/chess-ia/badge/?version=latest)](https://chess-ia.readthedocs.io/)
 
 Motor de ajedrez en Python, hecho como práctica de la asignatura de
@@ -10,6 +11,37 @@ Inteligencia Artificial. El objetivo final es tener:
 1. Un **juego de ajedrez completo**, con una página web para jugar contra un bot.
 2. Una **plataforma de bots**, para que cualquiera pueda programar su propio bot de ajedrez.
 3. **Bots propios** con distintas estrategias, y un torneo entre ellos.
+
+## 🤖 Crea tu propio bot
+
+¿Quieres que tu bot juegue en el torneo? Escríbelo, compruébalo y mándalo con un *pull request*:
+**[tutorial paso a paso](https://chess-ia.readthedocs.io/es/latest/subir-un-bot/)** · [referencia del API](https://chess-ia.readthedocs.io/es/latest/api-bots/)
+
+Un bot es una clase con un `name` y un método `choose_move` que recibe la
+partida y devuelve una jugada legal:
+
+```python
+from chess.bots import Bot
+
+
+class PrimerBot(Bot):
+    name = "primero"
+
+    def choose_move(self, game):
+        return game.jugadas_legales()[0]
+```
+
+Para comprobar que cumple el contrato (jugadas legales, sin excepciones, sin
+colgarse):
+
+```bash
+python -m chess.bots.validacion mi_modulo.PrimerBot
+```
+
+El tutorial completo, hasta el *pull request*, está en
+[docs/subir-un-bot.md](docs/subir-un-bot.md), y la referencia del API en
+[docs/api-bots.md](docs/api-bots.md). Al abrir un PR, GitHub Actions valida
+automáticamente todos los bots del catálogo.
 
 ## Estado del proyecto
 
@@ -22,6 +54,7 @@ Inteligencia Artificial. El objetivo final es tener:
 - [x] **Bots propios**: aleatorio, 1-paso, minimax con poda alfa-beta y `MLBot`
   (evaluación aprendida de partidas de Lichess + libro de aperturas). `ines`
   es una variante de `MLBot` con libro y hasta 4 segundos de búsqueda por jugada.
+  Además hay bots enviados por otros equipos: `montecarlo` (MCTS) y `dama-segura`.
 - [x] **Torneo** entre todos los bots y clasificación publicada automáticamente en la web
   (`python -m chess.torneo`, ver [docs/torneo.md](docs/torneo.md))
 
@@ -75,34 +108,6 @@ Salida de `print(board)`:
 ```
 
 Las piezas blancas se escriben en mayúscula y las negras en minúscula.
-
-## Crear tu propio bot
-
-Un bot es una clase con un `name` y un método `choose_move` que recibe la
-partida y devuelve una jugada legal:
-
-```python
-from chess.bots import Bot
-
-
-class PrimerBot(Bot):
-    name = "primero"
-
-    def choose_move(self, game):
-        return game.jugadas_legales()[0]
-```
-
-Para comprobar que cumple el contrato (jugadas legales, sin excepciones, sin
-colgarse):
-
-```bash
-python -m chess.bots.validacion mi_modulo.PrimerBot
-```
-
-El tutorial completo, hasta el *pull request*, está en
-[docs/subir-un-bot.md](docs/subir-un-bot.md), y la referencia del API en
-[docs/api-bots.md](docs/api-bots.md). Al abrir un PR, GitHub Actions valida
-automáticamente todos los bots del catálogo.
 
 ## Torneo y clasificación
 
