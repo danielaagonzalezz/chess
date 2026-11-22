@@ -41,7 +41,7 @@ y abre <http://localhost:8000>. (Hace falta servidor, no vale abrir el
 - Pyodide es Python compilado a WebAssembly. Se descarga de un CDN la
   primera vez (unos MB) y el navegador lo guarda en caché.
 - `worker.js` corre en un *Web Worker*: así el bot puede pensar (varios segundos
-  con `ml-6` o `ml-3s`) sin congelar la página.
+  con `ml-6` o `ml-5s`) sin congelar la página.
 - `app.js` habla con Python con mensajes: `nueva`, `jugar`, `mover_bot`,
   `deshacer`. Cada respuesta es el estado completo de la partida en JSON
   (casillas, jugadas legales, historial, jaque, resultado…).

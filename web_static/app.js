@@ -24,13 +24,15 @@ const DESCRIPCION_BOT = {
   "ml-2": "Evaluación aprendida de partidas de Lichess. Piensa 2 jugadas por delante (muy rápido).",
   "ml-4": "Evaluación aprendida de partidas de Lichess. Piensa 4 jugadas por delante.",
   "ml-6": "Evaluación aprendida de partidas de Lichess. Piensa 6 jugadas por delante: puede tardar unos segundos.",
-  "ml-3s": "Evaluación y libro de aperturas aprendidos de partidas de Lichess. Piensa hasta 3 s por jugada. El más fuerte.",
+  "ml-3s": "Evaluación y libro de aperturas aprendidos de partidas de Lichess. Piensa hasta 3 s por jugada.",
+  "ml-5s": "Evaluación y libro de aperturas aprendidos de partidas de Lichess. Piensa hasta 5 s por jugada. El más fuerte.",
 };
 
 // Bots que pueden tardar: se avisa mientras piensan.
 const TIEMPO_BOT = {
   "ml-6": "Puede tardar unos segundos.",
   "ml-3s": "Piensa hasta 3 segundos.",
+  "ml-5s": "Piensa hasta 5 segundos.",
 };
 
 const $ = (id) => document.getElementById(id);

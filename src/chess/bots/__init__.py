@@ -37,11 +37,12 @@ BOTS = {
     # la posicion, hasta 2 segundos por jugada (nivel parecido a minimax-3).
     DamaSegura.name: DamaSegura,
     # Evaluacion y libro de aperturas aprendidos de partidas de Lichess +
-    # busqueda rapida. "ml-3s" piensa hasta 3 segundos por jugada.
+    # busqueda rapida. "ml-3s" y "ml-5s" piensan hasta 3 y 5 segundos por jugada.
     "ml-2": _ml(profundidad=2),
     "ml-4": _ml(profundidad=4),
     "ml-6": _ml(profundidad=6),
     "ml-3s": _ml(tiempo=3, libro=True),
+    "ml-5s": _ml(tiempo=5, libro=True),
     InesBot.name: InesBot,
 }
 
