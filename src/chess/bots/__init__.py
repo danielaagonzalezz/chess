@@ -7,9 +7,12 @@ mayor nivel.
 """
 
 from chess.bots.base import Bot
+from chess.bots.dama_segura import DamaSegura
 from chess.bots.greedy_bot import GreedyBot
+from chess.bots.ines_bot import InesBot
 from chess.bots.minimax_bot import MinimaxBot
 from chess.bots.ml_bot import MLBot
+from chess.bots.montecarlo_bot import MonteCarloBot
 from chess.bots.random_bot import RandomBot
 
 
@@ -26,8 +29,13 @@ def _ml(profundidad=None, tiempo=None, libro=False):
 BOTS = {
     RandomBot.name: RandomBot,
     GreedyBot.name: GreedyBot,
+    # Monte Carlo (MCTS): muestrea partidas cortas en vez de mirar todas las jugadas.
+    MonteCarloBot.name: MonteCarloBot,
     "minimax-2": _minimax(2),
     "minimax-3": _minimax(3),
+    # Enviado por el equipo de Tic-Tac-Toe Arena: minimax sobre el material y
+    # la posicion, hasta 2 segundos por jugada (nivel parecido a minimax-3).
+    DamaSegura.name: DamaSegura,
     # Hasta profundidad 4, pero como mucho 5 segundos por jugada.
     "minimax-4": _minimax(4, tiempo=5),
     # Evaluacion y libro de aperturas aprendidos de partidas de Lichess +
@@ -36,6 +44,17 @@ BOTS = {
     "ml-4": _ml(profundidad=4),
     "ml-6": _ml(profundidad=6),
     "ml-3s": _ml(tiempo=3, libro=True),
+    InesBot.name: InesBot,
 }
 
-__all__ = ["Bot", "RandomBot", "GreedyBot", "MinimaxBot", "MLBot", "BOTS"]
+__all__ = [
+    "BOTS",
+    "Bot",
+    "DamaSegura",
+    "GreedyBot",
+    "InesBot",
+    "MLBot",
+    "MinimaxBot",
+    "MonteCarloBot",
+    "RandomBot",
+]

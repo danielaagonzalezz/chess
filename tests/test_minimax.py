@@ -160,8 +160,8 @@ def test_minimax_da_mate_con_rey_y_dama_contra_rey():
 
 def test_el_catalogo_incluye_los_bots_de_menor_a_mayor_nivel():
     assert list(BOTS) == [
-        "aleatorio", "1-paso", "minimax-2", "minimax-3", "minimax-4",
-        "ml-2", "ml-4", "ml-6", "ml-3s",
+        "aleatorio", "1-paso", "montecarlo", "minimax-2", "minimax-3", "dama-segura", "minimax-4",
+        "ml-2", "ml-4", "ml-6", "ml-3s", "ines",
     ]
 
 
@@ -217,4 +217,3 @@ def test_la_clave_de_posicion_distingue_posiciones_y_reconoce_repetidas():
     for m in ["b1c3", "b8c6", "g1f3", "g8f6"]:
         dos.jugar(m)
     assert uno.clave_posicion() == dos.clave_posicion()
-
