@@ -1,4 +1,4 @@
-# Bot con aprendizaje automático (`ml-2`, `ml-4`, `ml-6`, `ml-3s`)
+# Bot con aprendizaje automático (`ml-2`, `ml-4`, `ml-6`, `ml-3s`, `ml-5s`)
 
 Este directorio contiene todo lo necesario para **reproducir el aprendizaje**
 del bot a partir de partidas reales de [Lichess](https://database.lichess.org).

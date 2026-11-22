@@ -275,7 +275,7 @@ def calcular_elo(nombres, partidas, ancla=1000):
 
 
 def _resumir(nombres, partidas):
-    """Tabla de clasificacion ordenada: puntos, luego Sonneborn-Berger, luego Elo."""
+    """Tabla de clasificacion ordenada: puntos, luego Elo."""
     elo = calcular_elo(nombres, partidas)
     filas = {
         nombre: {
@@ -295,15 +295,7 @@ def _resumir(nombres, partidas):
             fila["derrotas"] += puntos == 0.0
             if p["fallo"] and clave in p["fallo"]:
                 fila["fallos"] += 1
-    # Desempate Sonneborn-Berger (el habitual en torneos de ajedrez): suma de
-    # los puntos de cada rival multiplicados por lo que se le saco. Premia
-    # puntuar contra los bots fuertes.
-    cruces = _cruces(nombres, partidas)
-    for nombre, fila in filas.items():
-        fila["sonneborn_berger"] = sum(
-            sacado * filas[rival]["puntos"] for rival, sacado in cruces[nombre].items())
-    tabla = sorted(filas.values(), key=lambda f: (
-        -f["puntos"], -f["sonneborn_berger"], -elo[f["bot"]], f["bot"]))
+    tabla = sorted(filas.values(), key=lambda f: (-f["puntos"], -elo[f["bot"]], f["bot"]))
     for posicion, fila in enumerate(tabla, 1):
         fila["posicion"] = posicion
         fila["elo"] = elo[fila["bot"]]
@@ -582,8 +574,7 @@ footer { margin-top:8px; color:var(--suave); font-size:.85rem; }
 
 <section>
   <h2>Clasificación completa</h2>
-  <p class="intro">Ordenada por puntos (victoria 1, tablas ½, derrota 0). Si dos bots empatan, gana el que
-  ha sacado más puntos contra los rivales fuertes (desempate Sonneborn-Berger, el de los torneos de ajedrez).</p>
+  <p class="intro">Ordenada por puntos (victoria 1, tablas ½, derrota 0) y, si empatan, por Elo.</p>
   <div class="tarjeta"><table class="clasificacion">
     <thead><tr><th class="pos">#</th><th class="izq">Bot</th><th class="izq col-elo">Elo</th><th>Puntos</th><th>Partidas</th><th>Victorias · tablas · derrotas</th><th>Fallos</th></tr></thead>
     <tbody>

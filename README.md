@@ -54,7 +54,7 @@ automáticamente todos los bots del catálogo.
 - [x] **Plataforma de bots**: API (`Bot`, catálogo `BOTS`), validación automática de
   bots nuevos y [tutorial](docs/subir-un-bot.md)
 - [x] **Bots propios**: `aleatorio`, `1-paso`, minimax con poda alfa-beta
-  (`minimax-2`, `minimax-3`) y `MLBot` (`ml-2`, `ml-4`, `ml-6`, `ml-3s`: evaluación
+  (`minimax-2`, `minimax-3`) y `MLBot` (`ml-2`, `ml-4`, `ml-6`, `ml-3s`, `ml-5s`: evaluación
   aprendida de partidas de Lichess + libro de aperturas).
 - [x] **Bots externos** recibidos por *pull request*: `montecarlo` (MCTS),
   `dama-segura` (minimax) e `ines` (variante de `MLBot` con hasta 4 s por jugada).

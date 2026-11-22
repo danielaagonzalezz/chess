@@ -42,7 +42,8 @@ class PrimerBot(Bot):
 | `minimax-3` | `MinimaxBot(3)` | Piensa 3 jugadas por delante (juega bien) |
 | `dama-segura` | `DamaSegura` | Minimax con poda alfa-beta sobre el material y la posición, con capturas al final y remate; hasta 2 segundos por jugada. Enviado por el equipo de [Tic-Tac-Toe Arena](https://github.com/antonioorteu2014-create/tictactoe-arena) |
 | `ml-2`, `ml-4`, `ml-6` | `MLBot(profundidad=N)` | Evaluación **aprendida** de partidas reales + búsqueda rápida, N jugadas por delante |
-| `ml-3s` | `MLBot(tiempo=3, libro=True)` | Lo mismo, pensando hasta 3 segundos por jugada y con libro de aperturas aprendido. El más fuerte |
+| `ml-3s` | `MLBot(tiempo=3, libro=True)` | Lo mismo, pensando hasta 3 segundos por jugada y con libro de aperturas aprendido |
+| `ml-5s` | `MLBot(tiempo=5, libro=True)` | Lo mismo, pensando hasta 5 segundos por jugada y con libro de aperturas aprendido. El más fuerte |
 | `montecarlo` | `MonteCarloBot` | Búsqueda de árbol de Monte Carlo (MCTS): no mira todas las jugadas, **muestrea** partidas cortas y se queda con la jugada que de media termina mejor. 1 segundo por jugada |
 
 El catálogo `BOTS` (en `chess/bots/__init__.py`) asocia cada nombre con una
@@ -176,8 +177,8 @@ regalaba piezas.
 
 **Un libro de aperturas aprendido.** `training/crear_libro.py` cuenta qué jugada se
 hace en cada posición de las primeras 16 medias jugadas y se queda con las más
-frecuentes. `ml-3s` juega una al azar, ponderada por frecuencia: conoce aperturas
-reales y no repite siempre la misma partida. Fuera del libro, piensa.
+frecuentes. `ml-3s` y `ml-5s` juegan una al azar, ponderada por frecuencia: conocen aperturas
+reales y no repiten siempre la misma partida. Fuera del libro, piensan.
 
 **Un motor de búsqueda rápido.** Las jugadas legales de `game.py` se calculan
 probando cada jugada, y cuestan ~1 ms por posición. `motor_rapido.py` es un segundo
