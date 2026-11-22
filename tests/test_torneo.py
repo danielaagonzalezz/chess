@@ -16,7 +16,7 @@ from chess.bots import BOTS, Bot, RandomBot
 from chess.move import Move
 from chess.pieces import square_from_algebraic as sq
 from chess.torneo import (
-    LIMITE_JUGADAS, a_html, a_markdown, calcular_elo, guardar, jugar_partida,
+    LIMITE_JUGADAS, _resumir, a_html, a_markdown, calcular_elo, guardar, jugar_partida,
     jugar_torneo, main,
 )
 
@@ -286,3 +286,24 @@ def test_la_linea_de_comandos(tmp_path, capsys):
 def test_la_linea_de_comandos_rechaza_bots_desconocidos():
     with pytest.raises(SystemExit):
         main(["--bots", "aleatorio,no-existe"])
+
+
+def test_el_desempate_premia_puntuar_contra_los_fuertes():
+    # "zeta" y "alfa" acaban con 1,5 puntos, pero "zeta" gano al lider ("fuerte")
+    # y "alfa" solo al ultimo ("flojo"): va delante "zeta" aunque por orden
+    # alfabetico iria detras.
+    def partida(blancas, negras, resultado):
+        return {"blancas": blancas, "negras": negras, "resultado": resultado, "fallo": None}
+
+    partidas = [
+        partida("zeta", "fuerte", "1-0"), partida("alfa", "flojo", "1-0"),
+        partida("zeta", "alfa", "1/2-1/2"), partida("fuerte", "flojo", "1-0"),
+        partida("flojo", "zeta", "1-0"), partida("fuerte", "alfa", "1-0"),
+    ]
+    tabla = _resumir(["alfa", "zeta", "fuerte", "flojo"], partidas)
+    orden = [f["bot"] for f in tabla]
+    assert orden.index("zeta") < orden.index("alfa")
+    puntos = {f["bot"]: f["puntos"] for f in tabla}
+    assert puntos["zeta"] == puntos["alfa"] == 1.5
+    desempate = {f["bot"]: f["sonneborn_berger"] for f in tabla}
+    assert desempate["zeta"] == 2.75 and desempate["alfa"] == 1.75

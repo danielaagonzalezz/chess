@@ -14,6 +14,12 @@ en cuanto se registra en `BOTS`: no hay que hacer nada más.
   azar (4 medias jugadas), **iguales para los dos bots de la pareja**, así que
   ninguno sale favorecido.
 - **Puntuación.** Victoria 1, tablas ½, derrota 0.
+- **Desempate Sonneborn-Berger.** Si dos bots acaban con los mismos puntos,
+  va delante el que los ha sacado contra rivales más fuertes. Para cada
+  rival se multiplican los puntos que se le sacaron por los puntos totales de
+  ese rival, y se suma todo: ganar a un bot que va arriba vale más que ganar
+  a uno que va abajo. Es el desempate habitual en los torneos de ajedrez. Si
+  siguen empatados, decide el Elo.
 - **Elo aproximado.** Se ajusta para que los resultados esperados coincidan
   con los reales. La media del torneo vale 1000. Un bot que lo gana todo tiene
   un Elo alto, pero finito.
